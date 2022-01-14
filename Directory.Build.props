@@ -3,7 +3,7 @@
     <!-- Meta Options -->
     <Authors>Nogic</Authors>
     <Copyright>©2019-2021 Nogic</Copyright>
-    <PackageProjectUrl>https://github.com/nogic1008/dotnet-ci-example</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/nogic1008/JsonConverters</PackageProjectUrl>
     <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

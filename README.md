@@ -6,7 +6,7 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/nogic1008/JsonConverters/badge)](https://www.codefactor.io/repository/github/nogic1008/JsonConverters)
 [![License](https://img.shields.io/github/license/nogic1008/JsonConverters)](LICENSE)
 
-Example of .NET Core + Github Actions
+Converters for `System.Text.Json`
 
 ## Setup
 

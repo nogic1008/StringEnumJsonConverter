@@ -1,9 +1,9 @@
-name: .NET Core CI/CD
+name: .NET CI
 
 on:
   push:
     branches:
-      - master
+      - main
     paths-ignore:
       - "**.md"
   pull_request:
@@ -22,14 +22,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2.4.0
-      - name: Setup .NET SDK # detected from global.json
+      - name: Setup .NET SDK
         uses: actions/setup-dotnet@v1.9.0
-      - name: Restore Tool
-        run: dotnet tool restore
       - name: Add Problem Matcher for dotnet-format
         uses: xt0rted/dotnet-format-problem-matcher@v1.2.0
       - name: Lint
-        run: dotnet format --check
+        run: dotnet format --verify-no-changes --verbosity detailed
 
   test:
     name: Debug Build & Test
@@ -46,7 +44,11 @@ jobs:
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
           restore-keys: |
             ${{ runner.os }}-nuget-
-      - name: Setup .NET SDK # detected from global.json
+      - name: Setup .NET Core 3.1 SDK
+        uses: actions/setup-dotnet@v1.9.0
+        with:
+          dotnet-version: 3.1.x
+      - name: Setup .NET SDK
         uses: actions/setup-dotnet@v1.9.0
 
       - name: Restore

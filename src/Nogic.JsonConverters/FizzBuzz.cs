@@ -1,4 +1,4 @@
-namespace Sample.Core
+namespace Nogic.JsonConverters
 {
     public static class FizzBuzz
     {

@@ -1,7 +1,7 @@
 using Xunit;
-using static Sample.Core.FizzBuzz;
+using static Nogic.JsonConverters.FizzBuzz;
 
-namespace Sample.Test
+namespace Nogic.JsonConverters.Test
 {
     public class FizzBuzzTest
     {

@@ -24,6 +24,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Using Include="System.Text.Json" />
+    <Using Include="FluentAssertions" />
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="../../src/Nogic.JsonConverters/Nogic.JsonConverters.csproj" />
   </ItemGroup>
 

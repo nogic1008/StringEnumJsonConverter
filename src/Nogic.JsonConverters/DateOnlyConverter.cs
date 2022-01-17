@@ -1,9 +1,6 @@
 #if NET6_0_OR_GREATER
 namespace Nogic.JsonConverters;
 
-using System.Text.Json;
-using System.Text.Json.Serialization;
-
 /// <summary>Json converter for <see cref="DateOnly"/>.</summary>
 public class DateOnlyConverter : JsonConverter<DateOnly>
 {

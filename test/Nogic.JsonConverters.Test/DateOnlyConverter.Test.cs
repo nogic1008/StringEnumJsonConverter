@@ -1,10 +1,6 @@
 #if NET6_0_OR_GREATER
 namespace Nogic.JsonConverters.Test;
 
-using System.Text.Json;
-using FluentAssertions;
-using Xunit;
-
 /// <summary>Unit test of <see cref="DateOnlyConverter"/></summary>
 public class DateOnlyConverterTest
 {

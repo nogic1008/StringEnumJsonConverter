@@ -18,6 +18,10 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' != 'net6.0'">
+    <PackageReference Include="Portable.System.DateTimeOnly" Version="6.0.0" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="../../src/Nogic.JsonConverters/Nogic.JsonConverters.csproj" />
   </ItemGroup>

@@ -9,8 +9,8 @@ public class DateOnlyConverter : JsonConverter<DateOnly>
 {
     private readonly string _serializationFormat;
 
-    public DateOnlyConverter(string? serializationFormat = null)
-        => _serializationFormat = serializationFormat ?? "yyyy-MM-dd";
+    public DateOnlyConverter(string serializationFormat = "yyyy-MM-dd")
+        => _serializationFormat = serializationFormat;
 
     public override DateOnly Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         => DateOnly.ParseExact(reader.GetString()!, _serializationFormat);

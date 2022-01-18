@@ -6,7 +6,11 @@ using System.Text.Json.Serialization;
 /// <summary>Unit test of <see cref="EnumStringConverter"/></summary>
 public sealed class EnumStringConverterTest
 {
-    [JsonConverter(typeof(EnumStringConverter<TestEnum>))]
+    private static readonly JsonSerializerOptions _options = new()
+    {
+        Converters = { new EnumStringConverter() }
+    };
+
     public enum TestEnum
     {
         None = 0,
@@ -21,14 +25,14 @@ public sealed class EnumStringConverterTest
     [InlineData(TestEnum.TwoTwo, "\"TwoTwo\"")]
     [InlineData(TestEnum.Four, "\"foo\"")]
     public void CanSerializeJson(TestEnum @enum, string expected)
-        => JsonSerializer.Serialize(@enum).Should().Be(expected);
+        => JsonSerializer.Serialize(@enum, _options).Should().Be(expected);
 
     [Theory]
     [InlineData(3)]
     [InlineData(100)]
     public void CannotSerializeJson(int @enum)
     {
-        var action = () => JsonSerializer.Serialize((TestEnum)@enum);
+        var action = () => JsonSerializer.Serialize((TestEnum)@enum, _options);
         action.Should().Throw<JsonException>();
     }
 
@@ -38,7 +42,7 @@ public sealed class EnumStringConverterTest
     [InlineData("\"TwoTwo\"", TestEnum.TwoTwo)]
     [InlineData("\"foo\"", TestEnum.Four)]
     public void CanDeserializeJson(string json, TestEnum expected)
-        => JsonSerializer.Deserialize<TestEnum>(json).Should().Be(expected);
+        => JsonSerializer.Deserialize<TestEnum>(json, _options).Should().Be(expected);
 
     [Theory]
     [InlineData("\"\"")]
@@ -47,7 +51,7 @@ public sealed class EnumStringConverterTest
     [InlineData("twotwo")]
     public void CannotDeserializeJson(string json)
     {
-        var action = () => JsonSerializer.Deserialize<TestEnum>(json);
+        var action = () => JsonSerializer.Deserialize<TestEnum>(json, _options);
         action.Should().Throw<JsonException>();
     }
 }

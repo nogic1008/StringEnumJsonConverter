@@ -38,6 +38,7 @@ public sealed class EnumStringConverterTest
 
     [Theory]
     [InlineData("\"None\"", TestEnum.None)]
+    [InlineData("1", TestEnum.OneOne)]
     [InlineData("\"one_one\"", TestEnum.OneOne)]
     [InlineData("\"TwoTwo\"", TestEnum.TwoTwo)]
     [InlineData("\"foo\"", TestEnum.Four)]
@@ -51,7 +52,11 @@ public sealed class EnumStringConverterTest
     [InlineData("twotwo")]
     public void CannotDeserializeJson(string json)
     {
-        var action = () => JsonSerializer.Deserialize<TestEnum>(json, _options);
+        var option = new JsonSerializerOptions()
+        {
+            Converters = { new EnumStringConverter(false) }
+        };
+        var action = () => JsonSerializer.Deserialize<TestEnum>(json, option);
         action.Should().Throw<JsonException>();
     }
 }

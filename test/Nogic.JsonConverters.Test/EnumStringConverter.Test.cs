@@ -15,112 +15,90 @@ public sealed class EnumStringConverterTest
         [EnumMember(Value = "foo")] Four = 4,
     }
 
-    private JsonSerializerOptions CreateOption(bool allowIntegerValues = true, JsonNamingPolicy? namingPolicy = null)
+    private JsonSerializerOptions CreateOption(bool allowInteger, bool useCamelCase)
         => new()
         {
-            Converters = { new EnumStringConverter(allowIntegerValues, namingPolicy) }
+            Converters = { new EnumStringConverter(allowInteger, useCamelCase ? JsonNamingPolicy.CamelCase : null) }
         };
 
     [Theory]
-    [InlineData((TestEnum)(-1), "-1")]
-    [InlineData(TestEnum.None, "\"None\"")]
-    [InlineData(TestEnum.OneOne, "\"One_one\"")]
-    [InlineData(TestEnum.TwoTwo, "\"TwoTwo\"")]
-    [InlineData(TestEnum.OneOne | TestEnum.TwoTwo, "\"OneOne, TwoTwo\"")]
-    [InlineData(TestEnum.Four, "\"foo\"")]
-    public void CanSerializeJson_Default(TestEnum @enum, string expected)
-        => JsonSerializer.Serialize(@enum, CreateOption()).Should().Be(expected);
+    // Default
+    [InlineData(true, false, (TestEnum)(-1), "-1")]
+    [InlineData(true, false, TestEnum.None, "\"None\"")]
+    [InlineData(true, false, TestEnum.OneOne, "\"One_one\"")]
+    [InlineData(true, false, TestEnum.TwoTwo, "\"TwoTwo\"")]
+    [InlineData(true, false, TestEnum.OneOne | TestEnum.TwoTwo, "\"OneOne, TwoTwo\"")]
+    [InlineData(true, false, TestEnum.Four, "\"foo\"")]
+    // Use JsonNamingPolicy.CamelCase
+    [InlineData(true, true, (TestEnum)(-1), "-1")]
+    [InlineData(true, true, TestEnum.None, "\"none\"")]
+    [InlineData(true, true, TestEnum.OneOne, "\"One_one\"")]
+    [InlineData(true, true, TestEnum.TwoTwo, "\"twoTwo\"")]
+    [InlineData(true, true, TestEnum.OneOne | TestEnum.TwoTwo, "\"oneOne, twoTwo\"")]
+    [InlineData(true, true, TestEnum.Four, "\"foo\"")]
+    // Disallow integer
+    [InlineData(false, false, TestEnum.None, "\"None\"")]
+    [InlineData(false, false, TestEnum.OneOne, "\"One_one\"")]
+    [InlineData(false, false, TestEnum.TwoTwo, "\"TwoTwo\"")]
+    [InlineData(false, false, TestEnum.OneOne | TestEnum.TwoTwo, "\"OneOne, TwoTwo\"")]
+    [InlineData(false, false, TestEnum.Four, "\"foo\"")]
+    public void CanSerializeJson(bool allowInteger, bool useCamelCase, TestEnum @enum, string expected)
+        => JsonSerializer.Serialize(@enum, CreateOption(allowInteger, useCamelCase)).Should().Be(expected);
 
     [Theory]
-    [InlineData("-1", (TestEnum)(-1))]
-    [InlineData("\"None\"", TestEnum.None)]
-    [InlineData("\"One_one\"", TestEnum.OneOne)]
-    [InlineData("\"TwoTwo\"", TestEnum.TwoTwo)]
-    [InlineData("\"OneOne, TwoTwo\"", TestEnum.OneOne | TestEnum.TwoTwo)]
-    [InlineData("\"4\"", TestEnum.Four)]
-    public void CanDeserializeJson_Default(string json, TestEnum expected)
-        => JsonSerializer.Deserialize<TestEnum>(json, CreateOption()).Should().Be(expected);
-
-    [Theory]
-    [InlineData("\"\"")]
-    [InlineData("OneOne")]
-    [InlineData("twotwo")]
-    [InlineData("\"One_one, TwoTwo\"")]
-    public void CannotDeserializeJson_Default(string json)
+    // Disallow integer
+    [InlineData(false, false, (TestEnum)(-1))]
+    public void CannotSerializeJson(bool allowInteger, bool useCamelCase, TestEnum @enum)
     {
-        var action = () => JsonSerializer.Deserialize<TestEnum>(json, CreateOption());
+        var action = () => JsonSerializer.Serialize(@enum, CreateOption(allowInteger, useCamelCase));
         action.Should().Throw<JsonException>();
     }
 
     [Theory]
-    [InlineData((TestEnum)(-1), "-1")]
-    [InlineData(TestEnum.None, "\"none\"")]
-    [InlineData(TestEnum.OneOne, "\"One_one\"")]
-    [InlineData(TestEnum.TwoTwo, "\"twoTwo\"")]
-    [InlineData(TestEnum.OneOne | TestEnum.TwoTwo, "\"oneOne, twoTwo\"")]
-    [InlineData(TestEnum.Four, "\"foo\"")]
-    public void CanSerializeJson_CamelCase(TestEnum @enum, string expected)
-        => JsonSerializer.Serialize(@enum, CreateOption(namingPolicy: JsonNamingPolicy.CamelCase))
-            .Should().Be(expected);
+    // Default
+    [InlineData(true, false, "-1", (TestEnum)(-1))]
+    [InlineData(true, false, "\"None\"", TestEnum.None)]
+    [InlineData(true, false, "\"One_one\"", TestEnum.OneOne)]
+    [InlineData(true, false, "\"TwoTwo\"", TestEnum.TwoTwo)]
+    [InlineData(true, false, "\"OneOne, TwoTwo\"", TestEnum.OneOne | TestEnum.TwoTwo)]
+    [InlineData(true, false, "\"4\"", TestEnum.Four)]
+    // Use JsonNamingPolicy.CamelCase
+    [InlineData(true, true, "-1", (TestEnum)(-1))]
+    [InlineData(true, true, "\"none\"", TestEnum.None)]
+    [InlineData(true, true, "\"One_one\"", TestEnum.OneOne)]
+    [InlineData(true, true, "\"TwoTwo\"", TestEnum.TwoTwo)]
+    [InlineData(true, true, "\"OneOne, TwoTwo\"", TestEnum.OneOne | TestEnum.TwoTwo)]
+    [InlineData(true, true, "\"4\"", TestEnum.Four)]
+    // Disallow integer
+    [InlineData(false, false, "\"None\"", TestEnum.None)]
+    [InlineData(false, false, "\"One_one\"", TestEnum.OneOne)]
+    [InlineData(false, false, "\"TwoTwo\"", TestEnum.TwoTwo)]
+    [InlineData(false, false, "\"OneOne, TwoTwo\"", TestEnum.OneOne | TestEnum.TwoTwo)]
+    [InlineData(false, false, "\"4\"", TestEnum.Four)]
+    public void CanDeserializeJson(bool allowInteger, bool useCamelCase, string json, TestEnum expected)
+        => JsonSerializer.Deserialize<TestEnum>(json, CreateOption(allowInteger, useCamelCase)).Should().Be(expected);
 
     [Theory]
-    [InlineData("-1", (TestEnum)(-1))]
-    [InlineData("\"none\"", TestEnum.None)]
-    [InlineData("\"One_one\"", TestEnum.OneOne)]
-    [InlineData("\"TwoTwo\"", TestEnum.TwoTwo)]
-    [InlineData("\"OneOne, TwoTwo\"", TestEnum.OneOne | TestEnum.TwoTwo)]
-    [InlineData("\"4\"", TestEnum.Four)]
-    public void CanDeserializeJson_CamelCase(string json, TestEnum expected)
-        => JsonSerializer.Deserialize<TestEnum>(json, CreateOption(namingPolicy: JsonNamingPolicy.CamelCase))
-            .Should().Be(expected);
-
-    [Theory]
-    [InlineData("\"\"")]
-    [InlineData("OneOne")]
-    [InlineData("twotwo")]
-    [InlineData("\"One_one, TwoTwo\"")]
-    public void CannotDeserializeJson_CamelCase(string json)
+    // Default
+    [InlineData(true, false, "\"\"")]
+    [InlineData(true, false, "OneOne")]
+    [InlineData(true, false, "twotwo")]
+    [InlineData(true, false, "\"One_one, TwoTwo\"")]
+    // Use JsonNamingPolicy.CamelCase
+    [InlineData(true, true, "\"\"")]
+    [InlineData(true, true, "OneOne")]
+    [InlineData(true, true, "twotwo")]
+    [InlineData(true, true, "\"One_one, TwoTwo\"")]
+    // Disallow integer
+    [InlineData(false, false, "\"\"")]
+    [InlineData(false, false, "-1")]
+    [InlineData(false, false, "OneOne")]
+    [InlineData(false, false, "twotwo")]
+    [InlineData(false, false, "\"One_one, TwoTwo\"")]
+    public void CannotDeserializeJson(bool allowInteger, bool useCamelCase, string json)
     {
-        var action = () => JsonSerializer.Deserialize<TestEnum>(json, CreateOption(namingPolicy: JsonNamingPolicy.CamelCase));
+        var action = () => JsonSerializer.Deserialize<TestEnum>(json, CreateOption(allowInteger, useCamelCase));
         action.Should().Throw<JsonException>();
     }
 
-    [Theory]
-    [InlineData(TestEnum.None, "\"None\"")]
-    [InlineData(TestEnum.OneOne, "\"One_one\"")]
-    [InlineData(TestEnum.TwoTwo, "\"TwoTwo\"")]
-    [InlineData(TestEnum.OneOne | TestEnum.TwoTwo, "\"OneOne, TwoTwo\"")]
-    [InlineData(TestEnum.Four, "\"foo\"")]
-    public void CanSerializeJson_DisallowInteger(TestEnum @enum, string expected)
-        => JsonSerializer.Serialize(@enum, CreateOption(allowIntegerValues: false))
-            .Should().Be(expected);
-
-    [Fact]
-    public void CannotSerializeJson_DisallowInteger()
-    {
-        var action = () => JsonSerializer.Serialize((TestEnum)(-1), CreateOption(allowIntegerValues: false));
-        action.Should().Throw<JsonException>();
-    }
-
-    [Theory]
-    [InlineData("\"None\"", TestEnum.None)]
-    [InlineData("\"One_one\"", TestEnum.OneOne)]
-    [InlineData("\"TwoTwo\"", TestEnum.TwoTwo)]
-    [InlineData("\"OneOne, TwoTwo\"", TestEnum.OneOne | TestEnum.TwoTwo)]
-    [InlineData("\"4\"", TestEnum.Four)]
-    public void CanDeserializeJson_DisallowInteger(string json, TestEnum expected)
-        => JsonSerializer.Deserialize<TestEnum>(json, CreateOption(allowIntegerValues: false))
-            .Should().Be(expected);
-
-    [Theory]
-    [InlineData("\"\"")]
-    [InlineData("-1")]
-    [InlineData("OneOne")]
-    [InlineData("twotwo")]
-    [InlineData("\"One_one, TwoTwo\"")]
-    public void CannotDeserializeJson_DisallowInteger(string json)
-    {
-        var action = () => JsonSerializer.Deserialize<TestEnum>(json, CreateOption(allowIntegerValues: false));
-        action.Should().Throw<JsonException>();
-    }
 }

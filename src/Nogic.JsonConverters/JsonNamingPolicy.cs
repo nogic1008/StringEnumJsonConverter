@@ -1,24 +1,42 @@
 namespace Nogic.JsonConverters;
 
+/// <summary>Helper for <see cref="JsonNamingPolicy"/></summary>
 public abstract class JsonNamingPolicyBase : JsonNamingPolicy
 {
     /// <summary>
     /// <inheritdoc cref="JsonNamingPolicyBase(char)" path="/param[@name='separator']"/>
     /// </summary>
-    protected readonly char _separator;
+    private readonly char _separator;
 
-    /// <summary>Constractor.</summary>
+    /// <summary>
+    /// Initializes a new instance of <see cref="JsonNamingPolicyBase"/>.
+    /// </summary>
     /// <param name="separator">Word Separator</param>
     protected JsonNamingPolicyBase(char separator) => _separator = separator;
 
+    /// <summary>
+    /// Returns need to insert separator or not.
+    /// </summary>
+    /// <param name="c">original char</param>
     protected virtual bool IsWordSeparator(char c)
         => char.IsUpper(c) || char.IsDigit(c) || IsSkipWrite(c);
 
+    /// <summary>
+    /// Returns need to write <paramref name="c"/> or not.
+    /// </summary>
+    /// <param name="c">original char</param>
     protected virtual bool IsSkipWrite(char c)
         => "-_".Contains(c) || char.IsWhiteSpace(c);
 
-    protected abstract char Write(char c);
+    /// <summary>
+    /// Convert <paramref name="c"/> for write <see langword="char[]"/>.
+    /// Used in <see cref="ConvertName"/>.
+    /// </summary>
+    /// <param name="isTopOfWord">Cursor is top of word or not</param>
+    /// <param name="c">original char</param>
+    protected abstract char ConvertForWrite(bool isTopOfWord, char c);
 
+    /// <inheritdoc/>
     public sealed override string ConvertName(string name)
     {
         if (string.IsNullOrEmpty(name))
@@ -64,26 +82,44 @@ public abstract class JsonNamingPolicyBase : JsonNamingPolicy
                 isTopOfWord = false;
             }
             if (!IsSkipWrite(c))
-                buf[written++] = Write(c);
+                buf[written++] = ConvertForWrite(isTopOfWord, c);
         }
         return new string(buf);
     }
 }
 
+/// <summary>Naming policy for lower_snake_casing.</summary>
 public sealed class JsonLowerSnakeCaseNamingPolicy : JsonNamingPolicyBase
 {
+    /// <summary>
+    /// Initializes a new instance of <see cref="JsonLowerSnakeCaseNamingPolicy"/>
+    /// </summary>
     public JsonLowerSnakeCaseNamingPolicy() : base('_') { }
-    protected override char Write(char c) => char.ToLowerInvariant(c);
+
+    /// <inheritdoc/>
+    protected override char ConvertForWrite(bool _, char c) => char.ToLowerInvariant(c);
 }
 
+/// <summary>Naming policy for UPPER_SNAKE_CASING.</summary>
 public sealed class JsonUpperSnakeCaseNamingPolicy : JsonNamingPolicyBase
 {
+    /// <summary>
+    /// Initializes a new instance of <see cref="JsonUpperSnakeCaseNamingPolicy"/>
+    /// </summary>
     public JsonUpperSnakeCaseNamingPolicy() : base('_') { }
-    protected override char Write(char c) => char.ToUpperInvariant(c);
+
+    /// <inheritdoc/>
+    protected override char ConvertForWrite(bool _, char c) => char.ToUpperInvariant(c);
 }
 
+/// <summary>Naming policy for kebab-casing.</summary>
 public sealed class JsonKebabCaseNamingPolicy : JsonNamingPolicyBase
 {
+    /// <summary>
+    /// Initializes a new instance of <see cref="JsonKebabCaseNamingPolicy"/>
+    /// </summary>
     public JsonKebabCaseNamingPolicy() : base('-') { }
-    protected override char Write(char c) => char.ToLowerInvariant(c);
+
+    /// <inheritdoc/>
+    protected override char ConvertForWrite(bool _, char c) => char.ToLowerInvariant(c);
 }

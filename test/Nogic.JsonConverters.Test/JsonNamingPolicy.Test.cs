@@ -1,7 +1,11 @@
 namespace Nogic.JsonConverters.Test;
 
+/// <summary>Unit test for <see cref="JsonNamingPolicyBase"/></summary>
 public class JsonLowerCaseNamingPolicyTest
 {
+    /// <summary>Unit test for <see cref="JsonLowerSnakeCaseNamingPolicy"/></summary>
+    /// <param name="name">Original name</param>
+    /// <param name="expected">Converted name</param>
     [Theory]
     [InlineData("", "")]
     [InlineData("PascalCase", "pascal_case")]
@@ -16,6 +20,9 @@ public class JsonLowerCaseNamingPolicyTest
     public void JsonLowerSnakeCaseNamingPolicy_ConvertName(string name, string expected)
         => new JsonLowerSnakeCaseNamingPolicy().ConvertName(name).Should().Be(expected);
 
+    /// <summary>Unit test for <see cref="JsonUpperSnakeCaseNamingPolicy"/></summary>
+    /// <param name="name">Original name</param>
+    /// <param name="expected">Converted name</param>
     [Theory]
     [InlineData("", "")]
     [InlineData("PascalCase", "PASCAL_CASE")]
@@ -30,6 +37,9 @@ public class JsonLowerCaseNamingPolicyTest
     public void JsonUpperSnakeCaseNamingPolicy_ConvertName(string name, string expected)
         => new JsonUpperSnakeCaseNamingPolicy().ConvertName(name).Should().Be(expected);
 
+    /// <summary>Unit test for <see cref="JsonKebabCaseNamingPolicy"/></summary>
+    /// <param name="name">Original name</param>
+    /// <param name="expected">Converted name</param>
     [Theory]
     [InlineData("", "")]
     [InlineData("PascalCase", "pascal-case")]

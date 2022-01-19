@@ -85,7 +85,7 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
                 TypeCode.Byte => AsTEnum(reader.TryGetByte(out byte ubyte8), ref ubyte8),
                 TypeCode.Int16 => AsTEnum(reader.TryGetInt16(out short int16), ref int16),
                 TypeCode.UInt16 => AsTEnum(reader.TryGetUInt16(out ushort uint16), ref uint16),
-                _ => throw new JsonException(),
+                _ => throw new JsonException(), // This is dead path because TEnum is only based on above type.
             };
         }
 
@@ -147,7 +147,7 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
                     writer.WriteNumberValue(Unsafe.As<TEnum, sbyte>(ref value));
                     break;
                 default:
-                    throw new JsonException();
+                    throw new JsonException(); // This is dead path because TEnum is only based on above type.
             }
             return;
         }
@@ -169,7 +169,7 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
             TypeCode.Byte => (byte)value,
             TypeCode.Int16 => (ulong)(short)value,
             TypeCode.UInt16 => (ushort)value,
-            _ => throw new InvalidOperationException(),
+            _ => throw new InvalidOperationException(), // This is dead path because TEnum is only based on above type.
         };
 
     private bool TryAddNameCache(ulong key, string value, JsonSerializerOptions options)

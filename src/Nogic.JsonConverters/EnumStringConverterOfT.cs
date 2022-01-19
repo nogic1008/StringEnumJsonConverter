@@ -73,10 +73,8 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
 
     public override TEnum Read(ref Utf8JsonReader reader, Type _1, JsonSerializerOptions _2)
     {
-        if (reader.TokenType == JsonTokenType.Number)
+        if (reader.TokenType == JsonTokenType.Number && _allowIntegerValues)
         {
-            if (!_allowIntegerValues)
-                throw new JsonException();
             return _enumTypeCode switch
             {
                 TypeCode.Int32 => AsTEnum(reader.TryGetInt32(out int int32), ref int32),
@@ -91,7 +89,7 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
             };
         }
 
-        string? enumString = reader.GetString()!;
+        string enumString = reader.GetString()!;
         if (!_valueCache.TryGetValue(enumString, out var value) && !Enum.TryParse(enumString, ignoreCase: true, out value))
             throw new JsonException();
 

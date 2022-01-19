@@ -44,24 +44,15 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
         var values = GetEnumValues();
         var encoder = serializerOptions.Encoder;
 
-        for (int i = 0; i < values.Length; i++)
+        foreach (var item in values)
         {
-            if (_nameCache.Count >= NameCacheSizeSoftLimit)
+            ulong key = ConvertToUInt64(item);
+            var attr = GetAttribute(item);
+            string value = attr?.Value ?? ConvertName(item.ToString());
+            if (!TryAddNameCache(key, value, serializerOptions))
                 break;
-
-            var enumValue = values[i];
-
-            ulong key = ConvertToUInt64(enumValue);
-            var attr = GetAttribute(enumValue);
             if (attr?.IsValueSetExplicitly == true)
-            {
-                _nameCache.TryAdd(key, JsonEncodedText.Encode(attr.Value!, encoder));
-                _valueCache.TryAdd(attr.Value!, enumValue);
-            }
-            else
-            {
-                _nameCache.TryAdd(key, JsonEncodedText.Encode(ConvertName(enumValue.ToString()), encoder));
-            }
+                _valueCache.TryAdd(value, item);
         }
 
         TEnum[] GetEnumValues() =>
@@ -78,7 +69,7 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
                 .FirstOrDefault();
     }
 
-    public override bool CanConvert(Type type) => type.IsEnum;
+    public override bool CanConvert(Type type) => type == typeof(TEnum);
 
     public override TEnum Read(ref Utf8JsonReader reader, Type _1, JsonSerializerOptions _2)
     {
@@ -123,23 +114,9 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
         string original = value.ToString();
         if (IsValidIdentifier(original))
         {
-            // We are dealing with a combination of flag constants since
-            // all constant values were cached during warm-up.
-            var encoder = options.Encoder;
-
-            if (_nameCache.Count < NameCacheSizeSoftLimit)
-            {
-                formatted = JsonEncodedText.Encode(ConvertName(original), encoder);
-
-                writer.WriteStringValue(formatted);
-                _nameCache.TryAdd(key, formatted);
-            }
-            else
-            {
-                // We also do not create a JsonEncodedText instance here because passing the string
-                // directly to the writer is cheaper than creating one and not caching it for reuse.
-                writer.WriteStringValue(ConvertName(original));
-            }
+            string converted = ConvertName(original);
+            TryAddNameCache(key, converted, options);
+            writer.WriteStringValue(converted);
             return;
         }
 
@@ -196,6 +173,15 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
             TypeCode.UInt16 => (ushort)value,
             _ => throw new InvalidOperationException(),
         };
+
+    private bool TryAddNameCache(ulong key, string value, JsonSerializerOptions options)
+    {
+        if (_nameCache.Count >= NameCacheSizeSoftLimit)
+            return false;
+        var encoder = options.Encoder;
+        _nameCache.TryAdd(key, JsonEncodedText.Encode(value, encoder));
+        return true;
+    }
 
     private string ConvertName(string value)
     {

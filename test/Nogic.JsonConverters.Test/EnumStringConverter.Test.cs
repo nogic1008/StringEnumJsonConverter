@@ -15,7 +15,7 @@ public sealed class EnumStringConverterTest
         [EnumMember(Value = "foo")] Four = 4,
     }
 
-    private JsonSerializerOptions CreateOption(bool allowInteger, bool useCamelCase)
+    private static JsonSerializerOptions CreateOption(bool allowInteger, bool useCamelCase)
         => new()
         {
             Converters = { new EnumStringConverter(allowInteger, useCamelCase ? JsonNamingPolicy.CamelCase : null) }
@@ -101,4 +101,48 @@ public sealed class EnumStringConverterTest
         action.Should().Throw<JsonException>();
     }
 
+    public enum TestEnumInt32 : int { One = 1 }
+    public enum TestEnumUInt32 : uint { One = 1 }
+    public enum TestEnumUInt64 : ulong { One = 1 }
+    public enum TestEnumInt64 : long { One = 1 }
+    public enum TestEnumSByte : sbyte { One = 1 }
+    public enum TestEnumByte : byte { One = 1 }
+    public enum TestEnumInt16 : short { One = 1 }
+    public enum TestEnumUInt16 : ushort { One = 1 }
+
+    [Fact]
+    public void CanSerializeJson_Type()
+    {
+        var option = CreateOption(true, false);
+        JsonSerializer.Serialize(TestEnumInt32.One, option).Should().Be("\"One\"");
+        JsonSerializer.Serialize(TestEnumUInt32.One, option).Should().Be("\"One\"");
+        JsonSerializer.Serialize(TestEnumUInt64.One, option).Should().Be("\"One\"");
+        JsonSerializer.Serialize(TestEnumInt64.One, option).Should().Be("\"One\"");
+        JsonSerializer.Serialize(TestEnumSByte.One, option).Should().Be("\"One\"");
+        JsonSerializer.Serialize(TestEnumByte.One, option).Should().Be("\"One\"");
+        JsonSerializer.Serialize(TestEnumInt16.One, option).Should().Be("\"One\"");
+        JsonSerializer.Serialize(TestEnumUInt16.One, option).Should().Be("\"One\"");
+        JsonSerializer.Serialize((TestEnumInt32)2, option).Should().Be("2");
+        JsonSerializer.Serialize((TestEnumUInt32)2, option).Should().Be("2");
+        JsonSerializer.Serialize((TestEnumUInt64)2, option).Should().Be("2");
+        JsonSerializer.Serialize((TestEnumInt64)2, option).Should().Be("2");
+        JsonSerializer.Serialize((TestEnumSByte)2, option).Should().Be("2");
+        JsonSerializer.Serialize((TestEnumByte)2, option).Should().Be("2");
+        JsonSerializer.Serialize((TestEnumInt16)2, option).Should().Be("2");
+        JsonSerializer.Serialize((TestEnumUInt16)2, option).Should().Be("2");
+    }
+
+    [Fact]
+    public void CanDeserializeJson_Type()
+    {
+        var option = CreateOption(true, false);
+        JsonSerializer.Deserialize<TestEnumInt32>("1", option).Should().Be(TestEnumInt32.One);
+        JsonSerializer.Deserialize<TestEnumUInt32>("1", option).Should().Be(TestEnumUInt32.One);
+        JsonSerializer.Deserialize<TestEnumUInt64>("1", option).Should().Be(TestEnumUInt64.One);
+        JsonSerializer.Deserialize<TestEnumInt64>("1", option).Should().Be(TestEnumInt64.One);
+        JsonSerializer.Deserialize<TestEnumSByte>("1", option).Should().Be(TestEnumSByte.One);
+        JsonSerializer.Deserialize<TestEnumByte>("1", option).Should().Be(TestEnumByte.One);
+        JsonSerializer.Deserialize<TestEnumInt16>("1", option).Should().Be(TestEnumInt16.One);
+        JsonSerializer.Deserialize<TestEnumUInt16>("1", option).Should().Be(TestEnumUInt16.One);
+    }
 }

@@ -1,7 +1,6 @@
-namespace Nogic.JsonConverters.Test;
-
 using System.Runtime.Serialization;
-using System.Text.Json.Serialization;
+
+namespace Nogic.JsonConverters.Test;
 
 /// <summary>Unit test of <see cref="EnumStringConverter"/></summary>
 public sealed class EnumStringConverterTest

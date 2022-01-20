@@ -1,9 +1,9 @@
-namespace Nogic.JsonConverters;
-
 using System.Collections.Concurrent;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
+
+namespace Nogic.JsonConverters;
 
 /// <inheritdoc cref="EnumStringConverter" />
 /// <typeparam name="TEnum"><see langword="enum"/> type</typeparam>

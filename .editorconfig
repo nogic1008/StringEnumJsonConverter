@@ -29,9 +29,8 @@ indent_size = 4
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/code-style-rule-options
 ###################################
 
-#### Language rules ####
-
-### .NET style rules ###
+## Language rules > .NET style rules ##
+## https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/language-rules#net-style-rules
 [*.{cs,csx,cake,vb}]
 # "this." and "Me." preferences (IDE0003 & IDE0009)
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0003-ide0009
@@ -45,15 +44,14 @@ dotnet_style_qualification_for_event = false:warning
 dotnet_style_predefined_type_for_locals_parameters_members = true:warning
 dotnet_style_predefined_type_for_member_access = true:warning
 
-## .NET modifier preferences ##
+# Add accessibility modifiers (IDE0040)
+# https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0040
+dotnet_style_require_accessibility_modifiers = always:warning
+
 # Order modifiers (IDE0036)
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0036
 csharp_preferred_modifier_order = public,private,protected,internal,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,volatile,async
 visual_basic_preferred_modifier_order = Partial,Default,Private,Protected,Public,Friend,NotOverridable,Overridable,MustOverride,Overloads,Overrides,MustInherit,NotInheritable,Static,Shared,Shadows,ReadOnly,WriteOnly,Dim,Const,WithEvents,Widening,Narrowing,Custom,Async
-
-# Add accessibility modifiers (IDE0040)
-# https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0040
-dotnet_style_require_accessibility_modifiers = always:warning
 
 # Add readonly modifier (IDE0044)
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0044
@@ -65,9 +63,7 @@ dotnet_style_parentheses_in_arithmetic_binary_operators = always_for_clarity:war
 dotnet_style_parentheses_in_relational_binary_operators = always_for_clarity:warning
 dotnet_style_parentheses_in_other_binary_operators = always_for_clarity:warning
 dotnet_style_parentheses_in_other_operators = never_if_unnecessary:suggestion
-## End .NET modifier preferences ##
 
-## .NET expression-level preferences ##
 # Use object initializers (IDE0017)
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0017
 dotnet_style_object_initializer = true:warning
@@ -75,10 +71,6 @@ dotnet_style_object_initializer = true:warning
 # Use collection initializers (IDE0028)
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0028
 dotnet_style_collection_initializer = true:warning
-
-# Use auto property (IDE0032)
-# https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0032
-dotnet_style_prefer_auto_properties = true:warning
 
 # Use explicitly provided tuple name (IDE0033)
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0033
@@ -89,13 +81,17 @@ dotnet_style_explicit_tuple_names = true:warning
 dotnet_style_prefer_inferred_tuple_names = true:warning
 dotnet_style_prefer_inferred_anonymous_type_member_names = true:warning
 
+# Use auto property (IDE0032)
+# https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0032
+dotnet_style_prefer_auto_properties = true:warning
+
 # Use conditional expression for assignment (IDE0045)
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0045
-dotnet_style_prefer_conditional_expression_over_assignment = false:suggestion
+dotnet_style_prefer_conditional_expression_over_assignment = true:suggestion
 
 # Use conditional expression for return (IDE0046)
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0046
-dotnet_style_prefer_conditional_expression_over_return = false:suggestion
+dotnet_style_prefer_conditional_expression_over_return = true:suggestion
 
 # Use compound assignment (IDE0054 & IDE0074)
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0054-ide0074
@@ -108,9 +104,7 @@ dotnet_style_prefer_simplified_interpolation = true:suggestion
 # Simplify conditional expression (IDE0075)
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0075
 dotnet_style_prefer_simplified_boolean_expressions = true:warning
-## End .NET expression-level preferences ##
 
-## .NET null-checking preferences ##
 # Use coalesce expression (IDE0029 & IDE0030)
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0029-ide0030
 dotnet_style_coalesce_expression = true:warning
@@ -122,35 +116,28 @@ dotnet_style_null_propagation = true:warning
 # Use is null check (IDE0041)
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0041
 dotnet_style_prefer_is_null_check_over_reference_equality_method = true:warning
-## End .NET null-checking preferences ##
 
 # Require file header (IDE0073)
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0073
 file_header_template = unset
-### End .NET style rules ###
+## End .NET style rules ##
 
-### C# style rules ###
+## Language rules > C# style rules ##
+## https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/language-rules#c-style-rules
 [*.{cs,csx,cake}]
-## C# modifier preferences ##
-# Make local function static (IDE0062)
-# https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0062
-csharp_prefer_static_local_function = true:warning
-## End C# modifier preferences ##
-
 # 'var' preferences (IDE0007 & IDE0008)
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0007-ide0008
 csharp_style_var_for_built_in_types = false:warning
 csharp_style_var_when_type_is_apparent = true:warning
 csharp_style_var_elsewhere = true:warning
 
-## Expression-bodied-members ##
-# Use expression body for constructors (IDE0021)
-# https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0021
-csharp_style_expression_bodied_constructors = true:warning
-
 # Use expression body for methods (IDE0022)
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0022
 csharp_style_expression_bodied_methods = true:warning
+
+# Use expression body for constructors (IDE0021)
+# https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0021
+csharp_style_expression_bodied_constructors = true:warning
 
 # Use expression body for operators (IDE0023 & IDE0024)
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0023-ide0024
@@ -175,16 +162,14 @@ csharp_style_expression_bodied_lambdas = true:warning
 # Use expression body for local functions (IDE0061)
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0061
 csharp_style_expression_bodied_local_functions = true:warning
-## End Expression-bodied-members ##
-
-## Pattern matching preferences ##
-# Use pattern matching to avoid 'as' followed by a 'null' check (IDE0019)
-# https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0019
-csharp_style_pattern_matching_over_as_with_null_check = true:warning
 
 # Use pattern matching to avoid 'is' check followed by a cast (IDE0020)
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0020-ide0038
 csharp_style_pattern_matching_over_is_with_cast_check = true:warning
+
+# Use pattern matching to avoid 'as' followed by a 'null' check (IDE0019)
+# https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0019
+csharp_style_pattern_matching_over_as_with_null_check = true:warning
 
 # Use switch expression (IDE0066)
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0066
@@ -197,9 +182,7 @@ csharp_style_prefer_pattern_matching = true:warning
 # Use pattern matching (not operator) (IDE0083)
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0083
 csharp_style_prefer_not_pattern = true:warning
-## End Pattern matching preferences ##
 
-## C# expression-level preferences ##
 # Inline variable declaration (IDE0018)
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0018
 csharp_style_inlined_variable_declaration = true:warning
@@ -227,9 +210,7 @@ csharp_style_prefer_range_operator = true:suggestion
 # Simplify "new" expression (IDE0090)
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0090
 csharp_style_implicit_object_creation_when_type_is_apparent = true:warning
-## End C# expression-level preferences ##
 
-## C# null-checking preferences ##
 # Use throw expression (IDE0016)
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0016
 csharp_style_throw_expression = true:warning
@@ -237,9 +218,7 @@ csharp_style_throw_expression = true:warning
 # Use conditional delegate call (IDE1005)
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide1005
 csharp_style_conditional_delegate_call = true:warning
-## End C# null-checking preferences ##
 
-## Code block preferences ##
 # Add braces (IDE0011)
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0011
 csharp_prefer_braces = when_multiline:warning
@@ -247,20 +226,21 @@ csharp_prefer_braces = when_multiline:warning
 # Use simple 'using' statement (IDE0063)
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0063
 csharp_prefer_simple_using_statement = true:warning
-## End Code block preferences ##
-### End C# style rules ###
 
-### Visual Basic style rules ###
+# Make local function static (IDE0062)
+# https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0062
+csharp_prefer_static_local_function = true:warning
+## End C# style rules ##
+
+## Language rules > Visual Basic style rules ##
 [*.vb]
 # Use pattern matching ("IsNot" operator) (IDE0084)
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0084
 visual_basic_style_prefer_isnot_expression = true:warning
-### End Visual Basic style rules ###
+## End Visual Basic style rules ##
 
-#### End Language rules ####
-
-#### Unnecessary code rules ####
-
+## Unnecessary code rules ##
+## https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/unnecessary-code-rules
 [*.{cs,csx,cake,vb}]
 # Remove unnecessary expression value (IDE0058)
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0058
@@ -283,18 +263,24 @@ dotnet_remove_unnecessary_suppression_exclusions = none
 # Simplify object creation (IDE0140)
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0140
 visual_basic_style_prefer_simplified_object_creation = true
+## End Unnecessary code rules ##
 
-#### End Unnecessary code rules ####
-
-#### Formatting rules ####
-
+## Formatting rules > .NET formatting rules ##
+## https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/formatting-rules#net-formatting-rules
 [*.{cs,csx,cake,vb}]
 # Organize using directives
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/formatting-rules#organize-using-directives
 dotnet_sort_system_directives_first = true
 dotnet_separate_import_directive_groups = false
 
-# C# New-line options
+# Dotnet namespace options
+# https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/formatting-rules#dotnet-namespace-options
+dotnet_style_namespace_match_folder = true
+## End .NET formatting rules ##
+
+## Formatting rules > C# formatting rules ##
+[*.{cs,csx,cake}]
+# New-line options
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/formatting-rules#new-line-options
 csharp_new_line_before_open_brace = all
 csharp_new_line_before_else = true
@@ -304,7 +290,7 @@ csharp_new_line_before_members_in_object_initializers = true
 csharp_new_line_before_members_in_anonymous_types = true
 csharp_new_line_between_query_expression_clauses = true
 
-# C# Indentation options
+# Indentation options
 # https://docs.microsoft.com/visualstudio/ide/editorconfig-code-style-settings-reference#indent
 csharp_indent_case_contents = true
 csharp_indent_switch_labels = true
@@ -313,7 +299,7 @@ csharp_indent_block_contents = true
 csharp_indent_braces = false
 csharp_indent_case_contents_when_block = false
 
-# C# Spacing options
+# Spacing options
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/formatting-rules#spacing-options
 csharp_space_after_cast = false
 csharp_space_after_keywords_in_control_flow_statements = true
@@ -347,11 +333,13 @@ csharp_preserve_single_line_blocks = true
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/formatting-rules#using-directive-options
 csharp_using_directive_placement = outside_namespace
 
-#### End Formatting rules ####
+# Namespace options
+# https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/formatting-rules#namespace-options
+csharp_style_namespace_declarations = file_scoped
+## End C# formatting rules ##
 
-#### Naming rules ###
-# https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/naming-rules
-
+## Naming rules ##
+## https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/naming-rules
 [*.{cs,csx,cake,vb}]
 # Naming Symbols
 # constant_fields - Define constant fields
@@ -374,13 +362,13 @@ dotnet_naming_symbols.non_interface_types.applicable_kinds = class, struct, enum
 dotnet_naming_symbols.interface_types.applicable_kinds = interface
 
 # Naming Styles
-# camel_case - Define the camelCase style
+# camel_case - camelCase
 dotnet_naming_style.camel_case.capitalization = camel_case
-# pascal_case - Define the Pascal_case style
+# pascal_case - PascalCase
 dotnet_naming_style.pascal_case.capitalization = pascal_case
-# first_upper - The first character must start with an upper-case character
+# first_upper - Firstupper
 dotnet_naming_style.first_upper.capitalization = first_word_upper
-# prefix_interface_interface_with_i - Interfaces must be PascalCase and the first character of an interface must be an 'I'
+# prefix_interface_interface_with_i - IPascalCase
 dotnet_naming_style.prefix_interface_interface_with_i.capitalization = pascal_case
 dotnet_naming_style.prefix_interface_interface_with_i.required_prefix = I
 # under_scored - _underScored
@@ -400,7 +388,7 @@ dotnet_naming_rule.public_internal_fields_must_be_pascal_case.style = pascal_cas
 dotnet_naming_rule.private_protected_fields_must_be_camel_case.severity = warning
 dotnet_naming_rule.private_protected_fields_must_be_camel_case.symbols = private_protected_fields
 dotnet_naming_rule.private_protected_fields_must_be_camel_case.style = under_scored
-# Public members must be capitalized
+# Public members must be Firstupper
 dotnet_naming_rule.public_members_must_be_capitalized.severity = warning
 dotnet_naming_rule.public_members_must_be_capitalized.symbols = public_symbols
 dotnet_naming_rule.public_members_must_be_capitalized.style = first_upper
@@ -412,9 +400,8 @@ dotnet_naming_rule.parameters_must_be_camel_case.style = camel_case
 dotnet_naming_rule.non_interface_types_must_be_pascal_case.severity = warning
 dotnet_naming_rule.non_interface_types_must_be_pascal_case.symbols = non_interface_types
 dotnet_naming_rule.non_interface_types_must_be_pascal_case.style = pascal_case
-# Interfaces must be PascalCase and start with an 'I'
+# Interfaces must be IPascalCase
 dotnet_naming_rule.interface_types_must_be_prefixed_with_i.severity = warning
 dotnet_naming_rule.interface_types_must_be_prefixed_with_i.symbols = interface_types
 dotnet_naming_rule.interface_types_must_be_prefixed_with_i.style = prefix_interface_interface_with_i
-
-#### End Naming rules ###
+## End Naming rules ##

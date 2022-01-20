@@ -69,9 +69,9 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
                 .FirstOrDefault();
     }
 
-    public override bool CanConvert(Type type) => type == typeof(TEnum);
+    public override bool CanConvert(Type typeToConvert) => typeToConvert == typeof(TEnum);
 
-    public override TEnum Read(ref Utf8JsonReader reader, Type _1, JsonSerializerOptions _2)
+    public override TEnum Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType == JsonTokenType.Number && _allowIntegerValues)
         {

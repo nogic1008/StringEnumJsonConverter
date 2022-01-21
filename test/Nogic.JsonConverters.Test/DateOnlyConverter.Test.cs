@@ -1,7 +1,7 @@
 #if NET6_0_OR_GREATER
-namespace Nogic.JsonConverters.Test;
-
 using System.Globalization;
+
+namespace Nogic.JsonConverters.Test;
 
 /// <summary>Unit test of <see cref="DateOnlyConverter"/></summary>
 public class DateOnlyConverterTest

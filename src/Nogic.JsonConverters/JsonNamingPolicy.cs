@@ -97,7 +97,7 @@ public sealed class JsonLowerSnakeCaseNamingPolicy : JsonNamingPolicyBase
     public JsonLowerSnakeCaseNamingPolicy() : base('_') { }
 
     /// <inheritdoc/>
-    protected override char ConvertForWrite(bool _, char c) => char.ToLowerInvariant(c);
+    protected override char ConvertForWrite(bool isTopOfWord, char c) => char.ToLowerInvariant(c);
 }
 
 /// <summary>Naming policy for UPPER_SNAKE_CASING.</summary>
@@ -109,7 +109,7 @@ public sealed class JsonUpperSnakeCaseNamingPolicy : JsonNamingPolicyBase
     public JsonUpperSnakeCaseNamingPolicy() : base('_') { }
 
     /// <inheritdoc/>
-    protected override char ConvertForWrite(bool _, char c) => char.ToUpperInvariant(c);
+    protected override char ConvertForWrite(bool isTopOfWord, char c) => char.ToUpperInvariant(c);
 }
 
 /// <summary>Naming policy for kebab-casing.</summary>
@@ -121,5 +121,5 @@ public sealed class JsonKebabCaseNamingPolicy : JsonNamingPolicyBase
     public JsonKebabCaseNamingPolicy() : base('-') { }
 
     /// <inheritdoc/>
-    protected override char ConvertForWrite(bool _, char c) => char.ToLowerInvariant(c);
+    protected override char ConvertForWrite(bool isTopOfWord, char c) => char.ToLowerInvariant(c);
 }

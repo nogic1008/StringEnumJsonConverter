@@ -1,15 +1,16 @@
-namespace Nogic.JsonConverters;
-
 using System.Collections.Concurrent;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 
+namespace Nogic.JsonConverters;
+
 /// <inheritdoc cref="EnumStringConverter" />
 /// <typeparam name="TEnum"><see langword="enum"/> type</typeparam>
 public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : struct, Enum
 {
-    private static readonly TypeCode _enumTypeCode = Type.GetTypeCode(typeof(TEnum));
+    private static readonly Type _typeToConvert = typeof(TEnum);
+    private static readonly TypeCode _enumTypeCode = Type.GetTypeCode(_typeToConvert);
     private static readonly string? _negativeSign = ((int)_enumTypeCode % 2) == 0 ? null : NumberFormatInfo.CurrentInfo.NegativeSign;
 
     /// <summary>Mapping <typeparamref name="TEnum"/> to UTF-8 string.</summary>
@@ -35,16 +36,12 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
     private readonly JsonNamingPolicy? _namingPolicy;
 
     /// <inheritdoc cref="EnumStringConverter(bool, JsonNamingPolicy?)" />
-    public EnumStringConverter(bool allowIntegerValues, JsonNamingPolicy? namingPolicy, JsonSerializerOptions serializerOptions)
+    public EnumStringConverter(bool allowIntegerValues = true, JsonNamingPolicy? namingPolicy = null, JsonSerializerOptions? serializerOptions = null)
     {
         _allowIntegerValues = allowIntegerValues;
         _namingPolicy = namingPolicy;
 
-        var typeToConvert = typeof(TEnum);
-        var values = GetEnumValues();
-        var encoder = serializerOptions.Encoder;
-
-        foreach (var item in values)
+        foreach (var item in GetEnumValues())
         {
             ulong key = ConvertToUInt64(item);
             var attr = GetAttribute(item);
@@ -55,23 +52,23 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
                 _valueCache.TryAdd(value, item);
         }
 
-        TEnum[] GetEnumValues() =>
+        static TEnum[] GetEnumValues() =>
 #if NET5_0_OR_GREATER
             Enum.GetValues<TEnum>();
 #else
-            (TEnum[])Enum.GetValues(typeToConvert);
+            (TEnum[])Enum.GetValues(_typeToConvert);
 #endif
 
-        EnumMemberAttribute? GetAttribute(TEnum value)
-            => typeToConvert.GetMember(value.ToString())[0]
+        static EnumMemberAttribute? GetAttribute(TEnum value)
+            => _typeToConvert.GetMember(value.ToString())[0]
                 .GetCustomAttributes(typeof(EnumMemberAttribute), false)
                 .Cast<EnumMemberAttribute>()
                 .FirstOrDefault();
     }
 
-    public override bool CanConvert(Type type) => type == typeof(TEnum);
+    public override bool CanConvert(Type typeToConvert) => typeToConvert == _typeToConvert;
 
-    public override TEnum Read(ref Utf8JsonReader reader, Type _1, JsonSerializerOptions _2)
+    public override TEnum Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType == JsonTokenType.Number && _allowIntegerValues)
         {
@@ -85,15 +82,14 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
                 TypeCode.Byte => AsTEnum(reader.TryGetByte(out byte ubyte8), ref ubyte8),
                 TypeCode.Int16 => AsTEnum(reader.TryGetInt16(out short int16), ref int16),
                 TypeCode.UInt16 => AsTEnum(reader.TryGetUInt16(out ushort uint16), ref uint16),
-                _ => throw new JsonException(), // This is dead path because TEnum is only based on above type.
+                _ => default, // This is dead path because TEnum is only based on above type.
             };
         }
 
         string enumString = reader.GetString()!;
-        if (!_valueCache.TryGetValue(enumString, out var value) && !Enum.TryParse(enumString, ignoreCase: true, out value))
-            throw new JsonException();
-
-        return value;
+        return _valueCache.TryGetValue(enumString, out var value) || Enum.TryParse(enumString, true, out value)
+            ? value
+            : throw new JsonException();
 
         static TEnum AsTEnum<T>(bool success, ref T value)
             => success ? Unsafe.As<T, TEnum>(ref value) : throw new JsonException();
@@ -124,59 +120,57 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
             {
                 case TypeCode.Int32:
                     writer.WriteNumberValue(Unsafe.As<TEnum, int>(ref value));
-                    break;
+                    return;
                 case TypeCode.UInt32:
                     writer.WriteNumberValue(Unsafe.As<TEnum, uint>(ref value));
-                    break;
+                    return;
                 case TypeCode.UInt64:
                     writer.WriteNumberValue(Unsafe.As<TEnum, ulong>(ref value));
-                    break;
+                    return;
                 case TypeCode.Int64:
                     writer.WriteNumberValue(Unsafe.As<TEnum, long>(ref value));
-                    break;
+                    return;
                 case TypeCode.Int16:
                     writer.WriteNumberValue(Unsafe.As<TEnum, short>(ref value));
-                    break;
+                    return;
                 case TypeCode.UInt16:
                     writer.WriteNumberValue(Unsafe.As<TEnum, ushort>(ref value));
-                    break;
+                    return;
                 case TypeCode.Byte:
                     writer.WriteNumberValue(Unsafe.As<TEnum, byte>(ref value));
-                    break;
+                    return;
                 case TypeCode.SByte:
                     writer.WriteNumberValue(Unsafe.As<TEnum, sbyte>(ref value));
-                    break;
-                default:
-                    throw new JsonException(); // This is dead path because TEnum is only based on above type.
+                    return;
             }
-            return;
+            // This is dead path because TEnum is only based on above type.
         }
 
         throw new JsonException();
 
         static bool IsValidIdentifier(string value) =>
-            value[0] >= 'A' && (_negativeSign is null || !value.StartsWith(_negativeSign));
+            value[0] >= 'A' && (_negativeSign is null || !value.StartsWith(_negativeSign, StringComparison.Ordinal));
     }
 
-    private static ulong ConvertToUInt64(object value)
+    private static ulong ConvertToUInt64(TEnum value)
         => _enumTypeCode switch
         {
-            TypeCode.Int32 => (ulong)(int)value,
-            TypeCode.UInt32 => (uint)value,
-            TypeCode.UInt64 => (ulong)value,
-            TypeCode.Int64 => (ulong)(long)value,
-            TypeCode.SByte => (ulong)(sbyte)value,
-            TypeCode.Byte => (byte)value,
-            TypeCode.Int16 => (ulong)(short)value,
-            TypeCode.UInt16 => (ushort)value,
-            _ => throw new InvalidOperationException(), // This is dead path because TEnum is only based on above type.
+            TypeCode.Int32 => (ulong)Unsafe.As<TEnum, int>(ref value),
+            TypeCode.UInt32 => Unsafe.As<TEnum, uint>(ref value),
+            TypeCode.UInt64 => Unsafe.As<TEnum, ulong>(ref value),
+            TypeCode.Int64 => (ulong)Unsafe.As<TEnum, long>(ref value),
+            TypeCode.SByte => (ulong)Unsafe.As<TEnum, sbyte>(ref value),
+            TypeCode.Byte => Unsafe.As<TEnum, byte>(ref value),
+            TypeCode.Int16 => (ulong)Unsafe.As<TEnum, short>(ref value),
+            TypeCode.UInt16 => Unsafe.As<TEnum, ushort>(ref value),
+            _ => default // This is dead path because TEnum is only based on above type.
         };
 
-    private bool TryAddNameCache(ulong key, string value, JsonSerializerOptions options)
+    private bool TryAddNameCache(ulong key, string value, JsonSerializerOptions? options)
     {
         if (_nameCache.Count >= NameCacheSizeSoftLimit)
             return false;
-        var encoder = options.Encoder;
+        var encoder = options?.Encoder;
         _nameCache.TryAdd(key, JsonEncodedText.Encode(value, encoder));
         return true;
     }

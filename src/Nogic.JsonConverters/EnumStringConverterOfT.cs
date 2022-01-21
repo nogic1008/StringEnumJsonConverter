@@ -35,16 +35,13 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
     private readonly JsonNamingPolicy? _namingPolicy;
 
     /// <inheritdoc cref="EnumStringConverter(bool, JsonNamingPolicy?)" />
-    public EnumStringConverter(bool allowIntegerValues, JsonNamingPolicy? namingPolicy, JsonSerializerOptions serializerOptions)
+    public EnumStringConverter(bool allowIntegerValues = true, JsonNamingPolicy? namingPolicy = null, JsonSerializerOptions? serializerOptions = null)
     {
         _allowIntegerValues = allowIntegerValues;
         _namingPolicy = namingPolicy;
 
         var typeToConvert = typeof(TEnum);
-        var values = GetEnumValues();
-        var encoder = serializerOptions.Encoder;
-
-        foreach (var item in values)
+        foreach (var item in GetEnumValues())
         {
             ulong key = ConvertToUInt64(item);
             var attr = GetAttribute(item);
@@ -172,11 +169,11 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
             _ => throw new InvalidOperationException(), // This is dead path because TEnum is only based on above type.
         };
 
-    private bool TryAddNameCache(ulong key, string value, JsonSerializerOptions options)
+    private bool TryAddNameCache(ulong key, string value, JsonSerializerOptions? options)
     {
         if (_nameCache.Count >= NameCacheSizeSoftLimit)
             return false;
-        var encoder = options.Encoder;
+        var encoder = options?.Encoder;
         _nameCache.TryAdd(key, JsonEncodedText.Encode(value, encoder));
         return true;
     }

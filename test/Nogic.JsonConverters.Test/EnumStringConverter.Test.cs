@@ -27,7 +27,7 @@ public sealed class EnumStringConverterTest
     public void CanConvert_Returns_True()
     {
         // Arrange
-        var converter = new EnumStringConverter<TestEnumOver64>(true, null, new());
+        var converter = new EnumStringConverter<TestEnumOver64>();
 
         // Act - Assert
         converter.CanConvert(typeof(TestEnumOver64)).Should().BeTrue();
@@ -40,7 +40,7 @@ public sealed class EnumStringConverterTest
     public void CanConvert_Returns_False(Type type)
     {
         // Arrange
-        var converter = new EnumStringConverter<TestEnumOver64>(true, null, new());
+        var converter = new EnumStringConverter<TestEnumOver64>();
 
         // Act - Assert
         converter.CanConvert(type).Should().BeFalse();

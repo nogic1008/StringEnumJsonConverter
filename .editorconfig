@@ -405,3 +405,6 @@ dotnet_naming_rule.interface_types_must_be_prefixed_with_i.severity = warning
 dotnet_naming_rule.interface_types_must_be_prefixed_with_i.symbols = interface_types
 dotnet_naming_rule.interface_types_must_be_prefixed_with_i.style = prefix_interface_interface_with_i
 ## End Naming rules ##
+
+[*.Test.cs]
+dotnet_diagnostic.CA1707.severity = none

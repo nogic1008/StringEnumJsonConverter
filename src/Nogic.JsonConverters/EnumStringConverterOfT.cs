@@ -155,18 +155,18 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
             value[0] >= 'A' && (_negativeSign is null || !value.StartsWith(_negativeSign, StringComparison.Ordinal));
     }
 
-    private static ulong ConvertToUInt64(object value)
+    private static ulong ConvertToUInt64(TEnum value)
         => _enumTypeCode switch
         {
-            TypeCode.Int32 => (ulong)(int)value,
-            TypeCode.UInt32 => (uint)value,
-            TypeCode.UInt64 => (ulong)value,
-            TypeCode.Int64 => (ulong)(long)value,
-            TypeCode.SByte => (ulong)(sbyte)value,
-            TypeCode.Byte => (byte)value,
-            TypeCode.Int16 => (ulong)(short)value,
-            TypeCode.UInt16 => (ushort)value,
-            _ => throw new InvalidOperationException(), // This is dead path because TEnum is only based on above type.
+            TypeCode.Int32 => (ulong)Unsafe.As<TEnum, int>(ref value),
+            TypeCode.UInt32 => Unsafe.As<TEnum, uint>(ref value),
+            TypeCode.UInt64 => Unsafe.As<TEnum, ulong>(ref value),
+            TypeCode.Int64 => (ulong)Unsafe.As<TEnum, long>(ref value),
+            TypeCode.SByte => (ulong)Unsafe.As<TEnum, sbyte>(ref value),
+            TypeCode.Byte => Unsafe.As<TEnum, byte>(ref value),
+            TypeCode.Int16 => (ulong)Unsafe.As<TEnum, short>(ref value),
+            TypeCode.UInt16 => Unsafe.As<TEnum, ushort>(ref value),
+            _ => default // This is dead path because TEnum is only based on above type.
         };
 
     private bool TryAddNameCache(ulong key, string value, JsonSerializerOptions? options)

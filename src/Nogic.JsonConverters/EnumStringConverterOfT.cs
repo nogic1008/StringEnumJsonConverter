@@ -155,7 +155,7 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
         throw new JsonException();
 
         static bool IsValidIdentifier(string value) =>
-            value[0] >= 'A' && (_negativeSign is null || !value.StartsWith(_negativeSign));
+            value[0] >= 'A' && (_negativeSign is null || !value.StartsWith(_negativeSign, StringComparison.Ordinal));
     }
 
     private static ulong ConvertToUInt64(object value)
@@ -187,7 +187,7 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
             return value;
 
         const string ValueSeparator = ", ";
-        if (!value.Contains(ValueSeparator))
+        if (!value.Contains(ValueSeparator, StringComparison.Ordinal))
             return _namingPolicy.ConvertName(value);
 
         string[] enumValues = value.Split(new string[] { ValueSeparator }, StringSplitOptions.None);

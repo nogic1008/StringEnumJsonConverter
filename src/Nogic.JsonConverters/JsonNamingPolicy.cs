@@ -26,7 +26,7 @@ public abstract class JsonNamingPolicyBase : JsonNamingPolicy
     /// </summary>
     /// <param name="c">original char</param>
     protected virtual bool IsSkipWrite(char c)
-        => "-_".Contains(c, StringComparison.Ordinal) || char.IsWhiteSpace(c);
+        => "-_".Contains(c) || char.IsWhiteSpace(c);
 
     /// <summary>
     /// Convert <paramref name="c"/> for write <see langword="char[]"/>.

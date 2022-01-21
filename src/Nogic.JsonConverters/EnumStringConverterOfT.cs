@@ -9,7 +9,8 @@ namespace Nogic.JsonConverters;
 /// <typeparam name="TEnum"><see langword="enum"/> type</typeparam>
 public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : struct, Enum
 {
-    private static readonly TypeCode _enumTypeCode = Type.GetTypeCode(typeof(TEnum));
+    private static readonly Type _typeToConvert = typeof(TEnum);
+    private static readonly TypeCode _enumTypeCode = Type.GetTypeCode(_typeToConvert);
     private static readonly string? _negativeSign = ((int)_enumTypeCode % 2) == 0 ? null : NumberFormatInfo.CurrentInfo.NegativeSign;
 
     /// <summary>Mapping <typeparamref name="TEnum"/> to UTF-8 string.</summary>
@@ -40,7 +41,6 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
         _allowIntegerValues = allowIntegerValues;
         _namingPolicy = namingPolicy;
 
-        var typeToConvert = typeof(TEnum);
         foreach (var item in GetEnumValues())
         {
             ulong key = ConvertToUInt64(item);
@@ -52,21 +52,21 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
                 _valueCache.TryAdd(value, item);
         }
 
-        TEnum[] GetEnumValues() =>
+        static TEnum[] GetEnumValues() =>
 #if NET5_0_OR_GREATER
             Enum.GetValues<TEnum>();
 #else
-            (TEnum[])Enum.GetValues(typeToConvert);
+            (TEnum[])Enum.GetValues(_typeToConvert);
 #endif
 
-        EnumMemberAttribute? GetAttribute(TEnum value)
-            => typeToConvert.GetMember(value.ToString())[0]
+        static EnumMemberAttribute? GetAttribute(TEnum value)
+            => _typeToConvert.GetMember(value.ToString())[0]
                 .GetCustomAttributes(typeof(EnumMemberAttribute), false)
                 .Cast<EnumMemberAttribute>()
                 .FirstOrDefault();
     }
 
-    public override bool CanConvert(Type typeToConvert) => typeToConvert == typeof(TEnum);
+    public override bool CanConvert(Type typeToConvert) => typeToConvert == _typeToConvert;
 
     public override TEnum Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {

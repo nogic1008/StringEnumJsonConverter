@@ -82,15 +82,14 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
                 TypeCode.Byte => AsTEnum(reader.TryGetByte(out byte ubyte8), ref ubyte8),
                 TypeCode.Int16 => AsTEnum(reader.TryGetInt16(out short int16), ref int16),
                 TypeCode.UInt16 => AsTEnum(reader.TryGetUInt16(out ushort uint16), ref uint16),
-                _ => throw new JsonException(), // This is dead path because TEnum is only based on above type.
+                _ => default, // This is dead path because TEnum is only based on above type.
             };
         }
 
         string enumString = reader.GetString()!;
-        if (!_valueCache.TryGetValue(enumString, out var value) && !Enum.TryParse(enumString, ignoreCase: true, out value))
-            throw new JsonException();
-
-        return value;
+        return _valueCache.TryGetValue(enumString, out var value) || Enum.TryParse(enumString, true, out value)
+            ? value
+            : throw new JsonException();
 
         static TEnum AsTEnum<T>(bool success, ref T value)
             => success ? Unsafe.As<T, TEnum>(ref value) : throw new JsonException();
@@ -121,32 +120,30 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
             {
                 case TypeCode.Int32:
                     writer.WriteNumberValue(Unsafe.As<TEnum, int>(ref value));
-                    break;
+                    return;
                 case TypeCode.UInt32:
                     writer.WriteNumberValue(Unsafe.As<TEnum, uint>(ref value));
-                    break;
+                    return;
                 case TypeCode.UInt64:
                     writer.WriteNumberValue(Unsafe.As<TEnum, ulong>(ref value));
-                    break;
+                    return;
                 case TypeCode.Int64:
                     writer.WriteNumberValue(Unsafe.As<TEnum, long>(ref value));
-                    break;
+                    return;
                 case TypeCode.Int16:
                     writer.WriteNumberValue(Unsafe.As<TEnum, short>(ref value));
-                    break;
+                    return;
                 case TypeCode.UInt16:
                     writer.WriteNumberValue(Unsafe.As<TEnum, ushort>(ref value));
-                    break;
+                    return;
                 case TypeCode.Byte:
                     writer.WriteNumberValue(Unsafe.As<TEnum, byte>(ref value));
-                    break;
+                    return;
                 case TypeCode.SByte:
                     writer.WriteNumberValue(Unsafe.As<TEnum, sbyte>(ref value));
-                    break;
-                default:
-                    throw new JsonException(); // This is dead path because TEnum is only based on above type.
+                    return;
             }
-            return;
+            // This is dead path because TEnum is only based on above type.
         }
 
         throw new JsonException();

@@ -5,6 +5,13 @@ namespace Nogic.JsonConverters.Test;
 /// <summary>Unit test of <see cref="EnumStringConverter"/></summary>
 public sealed class EnumStringConverterTest
 {
+    /// <summary>
+    /// Create <see cref="JsonSerializerOptions"/> that contains <see cref="EnumStringConverter"/>.
+    /// </summary>
+    /// <param name="allowInteger">
+    /// <inheritdoc cref="EnumStringConverter(bool, JsonNamingPolicy?)" path="/param[@name='allowIntegerValues']"/>
+    /// </param>
+    /// <param name="useCamelCase">Use <see cref="JsonNamingPolicy.CamelCase"/> or not.</param>
     private static JsonSerializerOptions CreateOption(bool allowInteger, bool useCamelCase)
         => new()
         {
@@ -23,10 +30,17 @@ public sealed class EnumStringConverterTest
         G1, G2, G3, G4, G5, G6, G7, G8, G9, G0,
     }
 
+    /// <summary>
+    /// <see cref="EnumStringConverter{TEnum}.CanConvert"/> returns <see langword="true"/>.
+    /// </summary>
     [Fact]
     public void CanConvert_Returns_True()
         => new EnumStringConverter<TestEnumOver64>().CanConvert(typeof(TestEnumOver64)).Should().BeTrue();
 
+    /// <summary>
+    /// <see cref="EnumStringConverter{TEnum}.CanConvert"/> returns <see langword="false"/>.
+    /// </summary>
+    /// <param name="type">Type to convert</param>
     [Theory]
     [InlineData(typeof(string))]
     [InlineData(typeof(int))]
@@ -44,6 +58,13 @@ public sealed class EnumStringConverterTest
         [EnumMember(Value = "foo")] Four = 4,
     }
 
+    /// <summary>
+    /// <see cref="EnumStringConverter{TEnum}.Write"/> writes <paramref name="expected"/>.
+    /// </summary>
+    /// <inheritdoc cref="CreateOption" path="/param[@name='allowInteger']"/>
+    /// <inheritdoc cref="CreateOption" path="/param[@name='useCamelCase']"/>
+    /// <param name="enum">Serialize target</param>
+    /// <param name="expected">Expected JSON string</param>
     [Theory]
     // Default
     [InlineData(true, false, (TestForConvert)(-1), "-1")]
@@ -68,6 +89,12 @@ public sealed class EnumStringConverterTest
     public void CanSerializeJson(bool allowInteger, bool useCamelCase, TestForConvert @enum, string expected)
         => JsonSerializer.Serialize(@enum, CreateOption(allowInteger, useCamelCase)).Should().Be(expected);
 
+    /// <summary>
+    /// <see cref="EnumStringConverter{TEnum}.Write"/> throws error.
+    /// </summary>
+    /// <inheritdoc cref="CreateOption" path="/param[@name='allowInteger']"/>
+    /// <inheritdoc cref="CreateOption" path="/param[@name='useCamelCase']"/>
+    /// <param name="enum">Serialize target</param>
     [Theory]
     // Disallow integer
     [InlineData(false, false, (TestForConvert)(-1))]
@@ -77,6 +104,13 @@ public sealed class EnumStringConverterTest
         action.Should().Throw<JsonException>();
     }
 
+    /// <summary>
+    /// <see cref="EnumStringConverter{TEnum}.Read"/> returns <paramref name="expected"/>.
+    /// </summary>
+    /// <inheritdoc cref="CreateOption" path="/param[@name='allowInteger']"/>
+    /// <inheritdoc cref="CreateOption" path="/param[@name='useCamelCase']"/>
+    /// <param name="json">JSON string</param>
+    /// <param name="expected">Expected <see langword="enum"/> value</param>
     [Theory]
     // Default
     [InlineData(true, false, "-1", (TestForConvert)(-1))]
@@ -101,6 +135,12 @@ public sealed class EnumStringConverterTest
     public void CanDeserializeJson(bool allowInteger, bool useCamelCase, string json, TestForConvert expected)
         => JsonSerializer.Deserialize<TestForConvert>(json, CreateOption(allowInteger, useCamelCase)).Should().Be(expected);
 
+    /// <summary>
+    /// <see cref="EnumStringConverter{TEnum}.Read"/> throws error.
+    /// </summary>
+    /// <inheritdoc cref="CreateOption" path="/param[@name='allowInteger']"/>
+    /// <inheritdoc cref="CreateOption" path="/param[@name='useCamelCase']"/>
+    /// <param name="json">JSON string</param>
     [Theory]
     // Default
     [InlineData(true, false, "\"\"")]
@@ -141,6 +181,11 @@ public sealed class EnumStringConverterTest
     /// <summary>For <see langword="ushort"/> based testing</summary>
     private enum TestEnumUInt16 : ushort { One = 1 }
 
+    /// <summary>
+    /// <see cref="EnumStringConverter{TEnum}.Write"/> writes <paramref name="expected"/>.
+    /// </summary>
+    /// <param name="enum">Serialize target</param>
+    /// <param name="expected">Expected JSON string</param>
     [Theory]
     [InlineData(TestEnumInt32.One, "\"One\"")]
     [InlineData(TestEnumUInt32.One, "\"One\"")]
@@ -161,6 +206,9 @@ public sealed class EnumStringConverterTest
     public void CanSerializeJson_Type(object @enum, string expected)
         => JsonSerializer.Serialize(@enum, CreateOption(true, false)).Should().Be(expected);
 
+    /// <summary>
+    /// <see cref="EnumStringConverter{TEnum}.Read"/> returns expected <see langword="enum"/>.
+    /// </summary>
     [Fact]
     public void CanDeserializeJson_Type()
     {

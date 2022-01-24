@@ -9,11 +9,16 @@ namespace Nogic.JsonConverters;
 /// <typeparam name="TEnum"><see langword="enum"/> type</typeparam>
 public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : struct, Enum
 {
+    /// <summary>Cashe of typeof(<typeparamref name="TEnum"/>)</summary>
     private static readonly Type _typeToConvert = typeof(TEnum);
+
+    /// <summary>Cashe of <see cref="TypeCode"/></summary>
     private static readonly TypeCode _enumTypeCode = Type.GetTypeCode(_typeToConvert);
+
+    /// <summary><see cref="NumberFormatInfo.CurrentInfo.NegativeSign"/></summary>
     private static readonly string? _negativeSign = ((int)_enumTypeCode % 2) == 0 ? null : NumberFormatInfo.CurrentInfo.NegativeSign;
 
-    /// <summary>Mapping <typeparamref name="TEnum"/> to UTF-8 string.</summary>
+    /// <summary>Mapping <typeparamref name="TEnum"/> to Encoded string.</summary>
     private readonly ConcurrentDictionary<ulong, JsonEncodedText> _nameCache = new();
 
     /// <summary>Mapping <see langword="string"/> to <typeparamref name="TEnum"/>.</summary>
@@ -35,7 +40,10 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
     /// </summary>
     private readonly JsonNamingPolicy? _namingPolicy;
 
-    /// <inheritdoc cref="EnumStringConverter(bool, JsonNamingPolicy?)" />
+    /// <summary>Initializes a new instance of <see cref="EnumStringConverter{TEnum}"/>.</summary>
+    /// <inheritdoc cref="EnumStringConverter(bool, JsonNamingPolicy?)" path="/param[@name='allowIntegerValues']"/>
+    /// <inheritdoc cref="EnumStringConverter(bool, JsonNamingPolicy?)" path="/param[@name='namingPolicy']"/>
+    /// <param name="serializerOptions">The serialization options to use.</param>
     public EnumStringConverter(bool allowIntegerValues = true, JsonNamingPolicy? namingPolicy = null, JsonSerializerOptions? serializerOptions = null)
     {
         _allowIntegerValues = allowIntegerValues;
@@ -43,10 +51,9 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
 
         foreach (var item in GetEnumValues())
         {
-            ulong key = ConvertToUInt64(item);
             var attr = GetAttribute(item);
             string value = attr?.Value ?? ConvertName(item.ToString());
-            if (!TryAddNameCache(key, value, serializerOptions))
+            if (!TryAddNameCache(ConvertToUInt64(item), value, serializerOptions))
                 break;
             if (attr?.IsValueSetExplicitly == true)
                 _valueCache.TryAdd(value, item);
@@ -66,8 +73,10 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
                 .FirstOrDefault();
     }
 
+    /// <inheritdoc/>
     public override bool CanConvert(Type typeToConvert) => typeToConvert == _typeToConvert;
 
+    /// <inheritdoc/>
     public override TEnum Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType == JsonTokenType.Number && _allowIntegerValues)
@@ -95,6 +104,7 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
             => success ? Unsafe.As<T, TEnum>(ref value) : throw new JsonException();
     }
 
+    /// <inheritdoc/>
     public override void Write(Utf8JsonWriter writer, TEnum value, JsonSerializerOptions options)
     {
         ulong key = ConvertToUInt64(value);
@@ -152,6 +162,7 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
             value[0] >= 'A' && (_negativeSign is null || !value.StartsWith(_negativeSign, StringComparison.Ordinal));
     }
 
+    /// <summary>Convert <typeparamref name="TEnum"/> to <see langword="ulong"/>.</summary>
     private static ulong ConvertToUInt64(TEnum value)
         => _enumTypeCode switch
         {
@@ -166,25 +177,39 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
             _ => default // This is dead path because TEnum is only based on above type.
         };
 
-    private bool TryAddNameCache(ulong key, string value, JsonSerializerOptions? options)
+    /// <summary>
+    /// Try to add (<typeparamref name="TEnum"/>, string) pair to <see cref="_nameCache"/>.
+    /// </summary>
+    /// <param name="key"><typeparamref name="TEnum"/> value (cast)</param>
+    /// <param name="name"><typeparamref name="TEnum"/> name</param>
+    /// <param name="options">Encoding option</param>
+    /// <returns>
+    /// <see langword="true"/> if succeed add, <see langword="falue"/> if exceed to <see cref="NameCacheSizeSoftLimit"/>.
+    /// </returns>
+    private bool TryAddNameCache(ulong key, string name, JsonSerializerOptions? options)
     {
         if (_nameCache.Count >= NameCacheSizeSoftLimit)
             return false;
         var encoder = options?.Encoder;
-        _nameCache.TryAdd(key, JsonEncodedText.Encode(value, encoder));
+        _nameCache.TryAdd(key, JsonEncodedText.Encode(name, encoder));
         return true;
     }
 
-    private string ConvertName(string value)
+    /// <summary>
+    /// Converts the specified name according to the <see cref="_namingPolicy"/>.
+    /// </summary>
+    /// <param name="name">The name to convert.</param>
+    /// <returns>The converted name.</returns>
+    private string ConvertName(string name)
     {
         if (_namingPolicy is null)
-            return value;
+            return name;
 
         const string ValueSeparator = ", ";
-        if (!value.Contains(ValueSeparator))
-            return _namingPolicy.ConvertName(value);
+        if (!name.Contains(ValueSeparator))
+            return _namingPolicy.ConvertName(name);
 
-        string[] enumValues = value.Split(new string[] { ValueSeparator }, StringSplitOptions.None);
+        string[] enumValues = name.Split(new string[] { ValueSeparator }, StringSplitOptions.None);
         for (int i = 0; i < enumValues.Length; i++)
             enumValues[i] = _namingPolicy.ConvertName(enumValues[i]);
         return string.Join(ValueSeparator, enumValues);

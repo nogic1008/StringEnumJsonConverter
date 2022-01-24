@@ -1,4 +1,3 @@
-#if NET6_0_OR_GREATER
 namespace Nogic.JsonConverters;
 
 /// <summary>Json converter for <see cref="TimeOnly"/>.</summary>
@@ -28,4 +27,3 @@ public class TimeOnlyConverter : JsonConverter<TimeOnly>
     public override void Write(Utf8JsonWriter writer, TimeOnly value, JsonSerializerOptions options)
         => writer.WriteStringValue(value.ToString(_serializationFormat, _provider));
 }
-#endif

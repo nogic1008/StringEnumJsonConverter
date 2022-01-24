@@ -9,26 +9,23 @@ namespace Nogic.JsonConverters;
 /// <typeparam name="TEnum"><see langword="enum"/> type</typeparam>
 public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : struct, Enum
 {
-    /// <summary>Cashe of typeof(<typeparamref name="TEnum"/>)</summary>
-    private static readonly Type _typeToConvert = typeof(TEnum);
-
     /// <summary>Cashe of <see cref="TypeCode"/></summary>
-    private static readonly TypeCode _enumTypeCode = Type.GetTypeCode(_typeToConvert);
+    private static readonly TypeCode _enumTypeCode = Type.GetTypeCode(typeof(TEnum));
 
     /// <summary>The string that denotes that the associated number is negative.</summary>
     private static readonly string? _negativeSign = ((int)_enumTypeCode % 2) == 0 ? null : NumberFormatInfo.CurrentInfo.NegativeSign;
+
+    /// <summary>
+    /// This is used to prevent flooding <see cref="_nameCache"/> due to exponential bitwise combinations of flags.
+    /// Since multiple threads can add to <see cref="_nameCache"/>, a few more values might be added.
+    /// </summary>
+    private const int NameCacheSizeSoftLimit = 64;
 
     /// <summary>Mapping <typeparamref name="TEnum"/> to Encoded string.</summary>
     private readonly ConcurrentDictionary<ulong, JsonEncodedText> _nameCache = new();
 
     /// <summary>Mapping <see langword="string"/> to <typeparamref name="TEnum"/>.</summary>
     private readonly ConcurrentDictionary<string, TEnum> _valueCache = new();
-
-    /// <summary>
-    /// This is used to prevent flooding the cache due to exponential bitwise combinations of flags.
-    /// Since multiple threads can add to the cache, a few more values might be added.
-    /// </summary>
-    private const int NameCacheSizeSoftLimit = 64;
 
     /// <summary>
     /// <inheritdoc cref="EnumStringConverter(bool, JsonNamingPolicy?)" path="/param[@name='allowIntegerValues']"/>
@@ -67,11 +64,11 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
 #if NET5_0_OR_GREATER
             Enum.GetValues<TEnum>();
 #else
-            (TEnum[])Enum.GetValues(_typeToConvert);
+            (TEnum[])Enum.GetValues(typeof(TEnum));
 #endif
 
         static EnumMemberAttribute? GetAttribute(TEnum value)
-            => _typeToConvert.GetMember(value.ToString())[0]
+            => typeof(TEnum).GetMember(value.ToString())[0]
                 .GetCustomAttributes(typeof(EnumMemberAttribute), false)
                 .Cast<EnumMemberAttribute>()
                 .FirstOrDefault();

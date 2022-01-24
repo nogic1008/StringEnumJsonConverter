@@ -1,4 +1,3 @@
-#if NET6_0_OR_GREATER
 using System.Globalization;
 
 namespace Nogic.JsonConverters.Test;
@@ -65,4 +64,3 @@ public class TimeOnlyConverterTest
     public void CanSerializeJson(string format, int hour, int minute, int second, string expected)
         => JsonSerializer.Serialize(new TimeOnly(hour, minute, second, 0), CreateOption(format)).Should().Be(expected);
 }
-#endif

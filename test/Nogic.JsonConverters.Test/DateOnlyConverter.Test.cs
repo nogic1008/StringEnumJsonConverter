@@ -1,4 +1,3 @@
-#if NET6_0_OR_GREATER
 using System.Globalization;
 
 namespace Nogic.JsonConverters.Test;
@@ -63,4 +62,3 @@ public class DateOnlyConverterTest
     public void CanSerializeJson(string format, int year, int month, int day, string expected)
         => JsonSerializer.Serialize(new DateOnly(year, month, day), CreateOption(format)).Should().Be(expected);
 }
-#endif

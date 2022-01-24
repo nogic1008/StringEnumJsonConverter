@@ -50,15 +50,19 @@ public class TimeOnlyConverterTest
         action.Should().Throw<FormatException>();
     }
 
-    private static IEnumerable<object[]> CanSerializeJsonData() => new[]
-    {
-        new object[] { "HH:mm:ss.fff", TimeOnly.MinValue, "\"00:00:00.000\"" },
-        new object[] { "HHmm", new TimeOnly(22, 0, 0), "\"2200\"" },
-        new object[] { "hh:mm:ss tt", TimeOnly.MaxValue, "\"11:59:59 PM\"" },
-    };
+    /// <summary>
+    /// <see cref="DateOnlyConverter.Write"/> writes <paramref name="expected"/>.
+    /// </summary>
+    /// <inheritdoc cref="CreateOption" path="/param[@name='format']"/>
+    /// <inheritdoc cref="TimeOnly(int, int, int, int)" path="/param[@name='hour']"/>
+    /// <inheritdoc cref="TimeOnly(int, int, int, int)" path="/param[@name='minute']"/>
+    /// <inheritdoc cref="TimeOnly(int, int, int, int)" path="/param[@name='second']"/>
+    /// <param name="expected">Expected JSON string</param>
     [Theory]
-    [MemberData(nameof(CanSerializeJsonData))]
-    public void CanSerializeJson(string format, TimeOnly time, string expected)
-        => JsonSerializer.Serialize(time, CreateOption(format)).Should().Be(expected);
+    [InlineData("HH:mm:ss.fff", 0, 0, 0, "\"00:00:00.000\"")]
+    [InlineData("HHmm", 22, 0, 0, "\"2200\"")]
+    [InlineData("hh:mm:ss tt", 23, 59, 59, "\"11:59:59 PM\"")]
+    public void CanSerializeJson(string format, int hour, int minute, int second, string expected)
+        => JsonSerializer.Serialize(new TimeOnly(hour, minute, second, 0), CreateOption(format)).Should().Be(expected);
 }
 #endif

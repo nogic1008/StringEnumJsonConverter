@@ -48,15 +48,19 @@ public class DateOnlyConverterTest
         action.Should().Throw<FormatException>();
     }
 
-    private static IEnumerable<object[]> CanSerializeJsonData() => new[]
-    {
-        new object[] { "yyyy-MM-dd", DateOnly.MinValue, "\"0001-01-01\"" },
-        new object[] { "yy/MM/dd", new DateOnly(2022, 1, 1), "\"22/01/01\"" },
-        new object[] { "MM/dd/yyyy g", DateOnly.MaxValue, "\"12/31/9999 A.D.\"" },
-    };
+    /// <summary>
+    /// <see cref="DateOnlyConverter.Write"/> writes <paramref name="expected"/>.
+    /// </summary>
+    /// <inheritdoc cref="CreateOption" path="/param[@name='format']"/>
+    /// <inheritdoc cref="DateOnly(int, int, int)" path="/param[@name='year']"/>
+    /// <inheritdoc cref="DateOnly(int, int, int)" path="/param[@name='month']"/>
+    /// <inheritdoc cref="DateOnly(int, int, int)" path="/param[@name='day']"/>
+    /// <param name="expected">Expected JSON string</param>
     [Theory]
-    [MemberData(nameof(CanSerializeJsonData))]
-    public void CanSerializeJson(string format, DateOnly date, string expected)
-        => JsonSerializer.Serialize(date, CreateOption(format)).Should().Be(expected);
+    [InlineData("yyyy-MM-dd", 1, 1, 1, "\"0001-01-01\"")]
+    [InlineData("yy/MM/dd", 2022, 1, 1, "\"22/01/01\"")]
+    [InlineData("MM/dd/yyyy g", 9999, 12, 31, "\"12/31/9999 A.D.\"")]
+    public void CanSerializeJson(string format, int year, int month, int day, string expected)
+        => JsonSerializer.Serialize(new DateOnly(year, month, day), CreateOption(format)).Should().Be(expected);
 }
 #endif

@@ -78,9 +78,6 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
     }
 
     /// <inheritdoc/>
-    public override bool CanConvert(Type typeToConvert) => typeToConvert == _typeToConvert;
-
-    /// <inheritdoc/>
     public override TEnum Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType == JsonTokenType.Number && _allowIntegerValues)

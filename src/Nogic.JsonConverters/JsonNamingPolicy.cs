@@ -1,6 +1,9 @@
+using System.ComponentModel;
+
 namespace Nogic.JsonConverters;
 
 /// <summary>Helper for <see cref="JsonNamingPolicy"/></summary>
+[EditorBrowsable(EditorBrowsableState.Never)]
 public abstract class JsonNamingPolicyBase : JsonNamingPolicy
 {
     /// <summary>

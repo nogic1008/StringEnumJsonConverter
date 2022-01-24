@@ -13,18 +13,20 @@ public class EnumStringConverter : JsonConverterFactory
     /// </summary>
     private readonly JsonNamingPolicy? _namingPolicy;
 
-    /// <summary>Constractor.</summary>
+    /// <summary>Initializes a new instance of <see cref="EnumStringConverter"/>.</summary>
     /// <param name="allowIntegerValues">
-    /// True to allow undefined <see langword="enum"/> values. When <see langword="true"/>, if an <see langword="enum"/> value isn't
-    /// defined it will output as a number rather than a <see langword="string"/>.
+    /// True to allow undefined <see langword="enum"/> values.
+    /// When <see langword="true"/>, if an <see langword="enum"/> value isn't defined it will output as a number rather than a <see langword="string"/>.
     /// </param>
     /// <param name="namingPolicy">Naming policy of <see langword="enum"/> strings.</param>
     public EnumStringConverter(bool allowIntegerValues = true, JsonNamingPolicy? namingPolicy = null)
         => (_allowIntegerValues, _namingPolicy) = (allowIntegerValues, namingPolicy);
 
+    /// <inheritdoc/>
     public override bool CanConvert(Type typeToConvert) => typeToConvert.IsEnum;
 
-    public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions options)
+    /// <inheritdoc/>
+    public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions? options)
         => (JsonConverter?)Activator.CreateInstance(
             typeof(EnumStringConverter<>).MakeGenericType(typeToConvert),
             new object?[] { _allowIntegerValues, _namingPolicy, options });

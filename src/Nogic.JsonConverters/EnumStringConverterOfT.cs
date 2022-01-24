@@ -15,7 +15,7 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
     /// <summary>Cashe of <see cref="TypeCode"/></summary>
     private static readonly TypeCode _enumTypeCode = Type.GetTypeCode(_typeToConvert);
 
-    /// <summary><see cref="NumberFormatInfo.CurrentInfo.NegativeSign"/></summary>
+    /// <summary>The string that denotes that the associated number is negative.</summary>
     private static readonly string? _negativeSign = ((int)_enumTypeCode % 2) == 0 ? null : NumberFormatInfo.CurrentInfo.NegativeSign;
 
     /// <summary>Mapping <typeparamref name="TEnum"/> to Encoded string.</summary>
@@ -41,8 +41,12 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
     private readonly JsonNamingPolicy? _namingPolicy;
 
     /// <summary>Initializes a new instance of <see cref="EnumStringConverter{TEnum}"/>.</summary>
+    /// <param name="allowIntegerValues">
     /// <inheritdoc cref="EnumStringConverter(bool, JsonNamingPolicy?)" path="/param[@name='allowIntegerValues']"/>
+    /// </param>
+    /// <param name="namingPolicy">
     /// <inheritdoc cref="EnumStringConverter(bool, JsonNamingPolicy?)" path="/param[@name='namingPolicy']"/>
+    /// </param>
     /// <param name="serializerOptions">The serialization options to use.</param>
     public EnumStringConverter(bool allowIntegerValues = true, JsonNamingPolicy? namingPolicy = null, JsonSerializerOptions? serializerOptions = null)
     {

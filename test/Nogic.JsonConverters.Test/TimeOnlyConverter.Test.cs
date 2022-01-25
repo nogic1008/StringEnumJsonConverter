@@ -30,7 +30,6 @@ public class TimeOnlyConverterTest
     public void CanDeserializeJson(string format, string json, int hour, int minute, int second, int millisecond)
         => JsonSerializer.Deserialize<TimeOnly>(json, CreateOption(format)).Should().Be(new(hour, minute, second, millisecond));
 
-
     /// <summary>
     /// <see cref="DateOnlyConverter.Read"/> throws error.
     /// </summary>

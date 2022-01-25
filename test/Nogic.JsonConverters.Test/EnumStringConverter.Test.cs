@@ -164,22 +164,22 @@ public sealed class EnumStringConverterTest
         action.Should().Throw<JsonException>();
     }
 
-    /// <summary>For <see langword="int"/> based testing</summary>
-    private enum TestEnumInt32 : int { One = 1 }
-    /// <summary>For <see langword="uint"/> based testing</summary>
-    private enum TestEnumUInt32 : uint { One = 1 }
-    /// <summary>For <see langword="ulong"/> based testing</summary>
-    private enum TestEnumUInt64 : ulong { One = 1 }
-    /// <summary>For <see langword="long"/> based testing</summary>
-    private enum TestEnumInt64 : long { One = 1 }
     /// <summary>For <see langword="sbyte"/> based testing</summary>
-    private enum TestEnumSByte : sbyte { One = 1 }
+    private enum TestEnumSByte : sbyte { Min = sbyte.MinValue, One = 1, Max = sbyte.MaxValue }
     /// <summary>For <see langword="byte"/> based testing</summary>
-    private enum TestEnumByte : byte { One = 1 }
+    private enum TestEnumByte : byte { Min = byte.MinValue, One = 1, Max = byte.MaxValue }
     /// <summary>For <see langword="short"/> based testing</summary>
-    private enum TestEnumInt16 : short { One = 1 }
+    private enum TestEnumInt16 : short { Min = short.MinValue, One = 1, Max = short.MaxValue }
     /// <summary>For <see langword="ushort"/> based testing</summary>
-    private enum TestEnumUInt16 : ushort { One = 1 }
+    private enum TestEnumUInt16 : ushort { Min = ushort.MinValue, One = 1, Max = ushort.MaxValue }
+    /// <summary>For <see langword="int"/> based testing</summary>
+    private enum TestEnumInt32 : int { Min = int.MinValue, One = 1, Max = int.MaxValue }
+    /// <summary>For <see langword="uint"/> based testing</summary>
+    private enum TestEnumUInt32 : uint { Min = uint.MinValue, One = 1, Max = uint.MaxValue }
+    /// <summary>For <see langword="long"/> based testing</summary>
+    private enum TestEnumInt64 : long { Min = long.MinValue, One = 1, Max = long.MaxValue }
+    /// <summary>For <see langword="ulong"/> based testing</summary>
+    private enum TestEnumUInt64 : ulong { Min = ulong.MinValue, One = 1, Max = ulong.MaxValue }
 
     /// <summary>
     /// <see cref="EnumStringConverter{TEnum}.Write"/> writes <paramref name="expected"/>.
@@ -187,22 +187,38 @@ public sealed class EnumStringConverterTest
     /// <param name="enum">Serialize target</param>
     /// <param name="expected">Expected JSON string</param>
     [Theory]
-    [InlineData(TestEnumInt32.One, "\"One\"")]
-    [InlineData(TestEnumUInt32.One, "\"One\"")]
-    [InlineData(TestEnumUInt64.One, "\"One\"")]
-    [InlineData(TestEnumInt64.One, "\"One\"")]
+    [InlineData(TestEnumSByte.Min, "\"Min\"")]
+    [InlineData(TestEnumByte.Min, "\"Min\"")]
+    [InlineData(TestEnumInt16.Min, "\"Min\"")]
+    [InlineData(TestEnumUInt16.Min, "\"Min\"")]
+    [InlineData(TestEnumInt32.Min, "\"Min\"")]
+    [InlineData(TestEnumUInt32.Min, "\"Min\"")]
+    [InlineData(TestEnumInt64.Min, "\"Min\"")]
+    [InlineData(TestEnumUInt64.Min, "\"Min\"")]
     [InlineData(TestEnumSByte.One, "\"One\"")]
     [InlineData(TestEnumByte.One, "\"One\"")]
     [InlineData(TestEnumInt16.One, "\"One\"")]
     [InlineData(TestEnumUInt16.One, "\"One\"")]
-    [InlineData((TestEnumInt32)2, "2")]
-    [InlineData((TestEnumUInt32)2, "2")]
-    [InlineData((TestEnumUInt64)2, "2")]
-    [InlineData((TestEnumInt64)2, "2")]
+    [InlineData(TestEnumInt32.One, "\"One\"")]
+    [InlineData(TestEnumUInt32.One, "\"One\"")]
+    [InlineData(TestEnumInt64.One, "\"One\"")]
+    [InlineData(TestEnumUInt64.One, "\"One\"")]
     [InlineData((TestEnumSByte)2, "2")]
     [InlineData((TestEnumByte)2, "2")]
     [InlineData((TestEnumInt16)2, "2")]
     [InlineData((TestEnumUInt16)2, "2")]
+    [InlineData((TestEnumInt32)2, "2")]
+    [InlineData((TestEnumUInt32)2, "2")]
+    [InlineData((TestEnumInt64)2, "2")]
+    [InlineData((TestEnumUInt64)2, "2")]
+    [InlineData(TestEnumSByte.Max, "\"Max\"")]
+    [InlineData(TestEnumByte.Max, "\"Max\"")]
+    [InlineData(TestEnumInt16.Max, "\"Max\"")]
+    [InlineData(TestEnumUInt16.Max, "\"Max\"")]
+    [InlineData(TestEnumInt32.Max, "\"Max\"")]
+    [InlineData(TestEnumUInt32.Max, "\"Max\"")]
+    [InlineData(TestEnumInt64.Max, "\"Max\"")]
+    [InlineData(TestEnumUInt64.Max, "\"Max\"")]
     public void CanSerializeJson_Type(object @enum, string expected)
         => JsonSerializer.Serialize(@enum, CreateOption(true, false)).Should().Be(expected);
 
@@ -213,13 +229,32 @@ public sealed class EnumStringConverterTest
     public void CanDeserializeJson_Type()
     {
         var option = CreateOption(true, false);
-        JsonSerializer.Deserialize<TestEnumInt32>("1", option).Should().Be(TestEnumInt32.One);
-        JsonSerializer.Deserialize<TestEnumUInt32>("1", option).Should().Be(TestEnumUInt32.One);
-        JsonSerializer.Deserialize<TestEnumUInt64>("1", option).Should().Be(TestEnumUInt64.One);
-        JsonSerializer.Deserialize<TestEnumInt64>("1", option).Should().Be(TestEnumInt64.One);
-        JsonSerializer.Deserialize<TestEnumSByte>("1", option).Should().Be(TestEnumSByte.One);
-        JsonSerializer.Deserialize<TestEnumByte>("1", option).Should().Be(TestEnumByte.One);
-        JsonSerializer.Deserialize<TestEnumInt16>("1", option).Should().Be(TestEnumInt16.One);
-        JsonSerializer.Deserialize<TestEnumUInt16>("1", option).Should().Be(TestEnumUInt16.One);
+        AssertDerialize(sbyte.MinValue.ToString(), TestEnumSByte.Min);
+        AssertDerialize(byte.MinValue.ToString(), TestEnumByte.Min);
+        AssertDerialize(short.MinValue.ToString(), TestEnumInt16.Min);
+        AssertDerialize(ushort.MinValue.ToString(), TestEnumUInt16.Min);
+        AssertDerialize(int.MinValue.ToString(), TestEnumInt32.Min);
+        AssertDerialize(uint.MinValue.ToString(), TestEnumUInt32.Min);
+        AssertDerialize(long.MinValue.ToString(), TestEnumInt64.Min);
+        AssertDerialize(ulong.MinValue.ToString(), TestEnumUInt64.Min);
+        AssertDerialize("1", TestEnumSByte.One);
+        AssertDerialize("1", TestEnumByte.One);
+        AssertDerialize("1", TestEnumInt16.One);
+        AssertDerialize("1", TestEnumUInt16.One);
+        AssertDerialize("1", TestEnumInt32.One);
+        AssertDerialize("1", TestEnumUInt32.One);
+        AssertDerialize("1", TestEnumInt64.One);
+        AssertDerialize("1", TestEnumUInt64.One);
+        AssertDerialize(sbyte.MaxValue.ToString(), TestEnumSByte.Max);
+        AssertDerialize(byte.MaxValue.ToString(), TestEnumByte.Max);
+        AssertDerialize(short.MaxValue.ToString(), TestEnumInt16.Max);
+        AssertDerialize(ushort.MaxValue.ToString(), TestEnumUInt16.Max);
+        AssertDerialize(int.MaxValue.ToString(), TestEnumInt32.Max);
+        AssertDerialize(uint.MaxValue.ToString(), TestEnumUInt32.Max);
+        AssertDerialize(long.MaxValue.ToString(), TestEnumInt64.Max);
+        AssertDerialize(ulong.MaxValue.ToString(), TestEnumUInt64.Max);
+
+        void AssertDerialize<T>(string json, T expected)
+            => JsonSerializer.Deserialize<T>(json, option).Should().Be(expected);
     }
 }

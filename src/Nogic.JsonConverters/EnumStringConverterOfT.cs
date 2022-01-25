@@ -22,7 +22,7 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
     private const int NameCacheSizeSoftLimit = 64;
 
     /// <summary>Mapping <typeparamref name="TEnum"/> to Encoded string.</summary>
-    private readonly ConcurrentDictionary<ulong, JsonEncodedText> _nameCache = new();
+    private readonly ConcurrentDictionary<long, JsonEncodedText> _nameCache = new();
 
     /// <summary>Mapping <see langword="string"/> to <typeparamref name="TEnum"/>.</summary>
     private readonly ConcurrentDictionary<string, TEnum> _valueCache = new();
@@ -54,7 +54,7 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
         {
             var attr = GetAttribute(item);
             string value = attr?.Value ?? ConvertName(item.ToString());
-            if (!TryAddNameCache(ConvertToUInt64(item), value, serializerOptions))
+            if (!TryAddNameCache(ConvertToInt64(item), value, serializerOptions))
                 break;
             if (attr?.IsValueSetExplicitly == true)
                 _valueCache.TryAdd(value, item);
@@ -105,7 +105,7 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
     /// <inheritdoc/>
     public override void Write(Utf8JsonWriter writer, TEnum value, JsonSerializerOptions options)
     {
-        ulong key = ConvertToUInt64(value);
+        long key = ConvertToInt64(value);
 
         if (_nameCache.TryGetValue(key, out var formatted))
         {
@@ -124,34 +124,11 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
 
         if (_allowIntegerValues)
         {
-            switch (_enumTypeCode)
-            {
-                case TypeCode.Int32:
-                    writer.WriteNumberValue(Unsafe.As<TEnum, int>(ref value));
-                    return;
-                case TypeCode.UInt32:
-                    writer.WriteNumberValue(Unsafe.As<TEnum, uint>(ref value));
-                    return;
-                case TypeCode.UInt64:
-                    writer.WriteNumberValue(Unsafe.As<TEnum, ulong>(ref value));
-                    return;
-                case TypeCode.Int64:
-                    writer.WriteNumberValue(Unsafe.As<TEnum, long>(ref value));
-                    return;
-                case TypeCode.Int16:
-                    writer.WriteNumberValue(Unsafe.As<TEnum, short>(ref value));
-                    return;
-                case TypeCode.UInt16:
-                    writer.WriteNumberValue(Unsafe.As<TEnum, ushort>(ref value));
-                    return;
-                case TypeCode.Byte:
-                    writer.WriteNumberValue(Unsafe.As<TEnum, byte>(ref value));
-                    return;
-                case TypeCode.SByte:
-                    writer.WriteNumberValue(Unsafe.As<TEnum, sbyte>(ref value));
-                    return;
-            }
-            // This is dead path because TEnum is only based on above type.
+            if (_enumTypeCode != TypeCode.UInt64)
+                writer.WriteNumberValue(ConvertToInt64(value));
+            else
+                writer.WriteNumberValue(Unsafe.As<TEnum, ulong>(ref value));
+            return;
         }
 
         throw new JsonException();
@@ -160,17 +137,18 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
             value[0] >= 'A' && (_negativeSign is null || !value.StartsWith(_negativeSign, StringComparison.Ordinal));
     }
 
-    /// <summary>Convert <typeparamref name="TEnum"/> to <see langword="ulong"/>.</summary>
-    private static ulong ConvertToUInt64(TEnum value)
+    /// <summary>Convert <typeparamref name="TEnum"/> to <see langword="long"/>.</summary>
+    /// <param name="value"><typeparamref name="TEnum"/> source</param>
+    private static long ConvertToInt64(TEnum value)
         => _enumTypeCode switch
         {
-            TypeCode.Int32 => (ulong)Unsafe.As<TEnum, int>(ref value),
+            TypeCode.Int32 => Unsafe.As<TEnum, int>(ref value),
             TypeCode.UInt32 => Unsafe.As<TEnum, uint>(ref value),
-            TypeCode.UInt64 => Unsafe.As<TEnum, ulong>(ref value),
-            TypeCode.Int64 => (ulong)Unsafe.As<TEnum, long>(ref value),
-            TypeCode.SByte => (ulong)Unsafe.As<TEnum, sbyte>(ref value),
+            TypeCode.UInt64 => (long)Unsafe.As<TEnum, ulong>(ref value),
+            TypeCode.Int64 => Unsafe.As<TEnum, long>(ref value),
+            TypeCode.SByte => Unsafe.As<TEnum, sbyte>(ref value),
             TypeCode.Byte => Unsafe.As<TEnum, byte>(ref value),
-            TypeCode.Int16 => (ulong)Unsafe.As<TEnum, short>(ref value),
+            TypeCode.Int16 => Unsafe.As<TEnum, short>(ref value),
             TypeCode.UInt16 => Unsafe.As<TEnum, ushort>(ref value),
             _ => default // This is dead path because TEnum is only based on above type.
         };
@@ -184,7 +162,7 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
     /// <returns>
     /// <see langword="true"/> if succeed add, <see langword="falue"/> if exceed to <see cref="NameCacheSizeSoftLimit"/>.
     /// </returns>
-    private bool TryAddNameCache(ulong key, string name, JsonSerializerOptions? options)
+    private bool TryAddNameCache(long key, string name, JsonSerializerOptions? options)
     {
         if (_nameCache.Count >= NameCacheSizeSoftLimit)
             return false;

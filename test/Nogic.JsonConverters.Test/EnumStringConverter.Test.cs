@@ -1,4 +1,5 @@
 using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 namespace Nogic.JsonConverters.Test;
 
@@ -55,7 +56,7 @@ public sealed class EnumStringConverterTest
         None = 0,
         [EnumMember(Value = "One_one")] OneOne = 1,
         [EnumMember] TwoTwo = 2,
-        [EnumMember(Value = "foo")] Four = 4,
+        [JsonPropertyName("foo")] Four = 4,
     }
 
     /// <summary>

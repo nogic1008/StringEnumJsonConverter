@@ -8,21 +8,27 @@
 
 Converters for `System.Text.Json`
 
-## Setup
+## Features
 
-```console
-> dotnet tool restore
-```
+### Converter
 
-## Commands
+For use, see [Register a custom converter](https://docs.microsoft.com/dotnet/standard/serialization/system-text-json-converters-how-to#register-a-custom-converter).
 
-```console
-# Lint & Fix
-> dotnet format
+#### `DateOnlyConverter`, `TimeOnlyConverter`
 
-# Unit Test
-> dotnet test
+Implementation of `JsonConverter<DateOnly>` and `JsonConverter<TimeOnly>`.
 
-# Build
-> dotnet build
-```
+#### `EnumStringConverter`
+
+Implementation of `JsonConverterFactory` for `enum` that uses [`EnumMemberAttribute`](https://docs.microsoft.com/dotnet/api/system.runtime.serialization.enummemberattribute)
+
+### JsonNamingPolicy
+
+See also [Use a custom JSON property naming policy](https://docs.microsoft.com/dotnet/standard/serialization/system-text-json-customize-properties#use-a-custom-json-property-naming-policy).
+
+- `JsonLowerSnakeCaseNamingPolicy`
+  - Convert property name to `snake_case`
+- `JsonUpperSnakeCaseNamingPolicy`
+  - Convert property name to `SNAKE_CASE`
+- `JsonKebabCaseNamingPolicy`
+  - Convert property name to `kebab-case`

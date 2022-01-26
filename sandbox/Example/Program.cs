@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Nogic.JsonConverters;
 
 var options = new JsonSerializerOptions()
@@ -48,7 +49,7 @@ internal enum Status
 {
     None = 0,
     [EnumMember(Value = "running")] Running = 1,
-    [EnumMember(Value = "fatal_error")] FatalError = 2,
+    [JsonPropertyName("fatal_error")] FatalError = 2,
 }
 
 internal record User(int Id, string Name, string MailAddress);

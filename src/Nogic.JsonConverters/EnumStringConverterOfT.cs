@@ -52,11 +52,12 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
 
         foreach (var item in GetEnumValues())
         {
-            var attr = GetAttribute(item);
-            string value = attr?.Value ?? ConvertName(item.ToString());
+            var jsonProp = GetJsonPropertyNameAttribute(item);
+            var attr = GetEnumMemberAttribute(item);
+            string value = jsonProp?.Name ?? attr?.Value ?? ConvertName(item.ToString());
             if (!TryAddNameCache(ConvertToInt64(item), value, serializerOptions))
                 break;
-            if (attr?.IsValueSetExplicitly == true)
+            if (jsonProp is not null || attr?.IsValueSetExplicitly == true)
                 _valueCache.TryAdd(value, item);
         }
 
@@ -67,7 +68,13 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
             (TEnum[])Enum.GetValues(typeof(TEnum));
 #endif
 
-        static EnumMemberAttribute? GetAttribute(TEnum value)
+        static JsonPropertyNameAttribute? GetJsonPropertyNameAttribute(TEnum value)
+            => typeof(TEnum).GetMember(value.ToString())[0]
+                .GetCustomAttributes(typeof(JsonPropertyNameAttribute), false)
+                .Cast<JsonPropertyNameAttribute>()
+                .FirstOrDefault();
+
+        static EnumMemberAttribute? GetEnumMemberAttribute(TEnum value)
             => typeof(TEnum).GetMember(value.ToString())[0]
                 .GetCustomAttributes(typeof(EnumMemberAttribute), false)
                 .Cast<EnumMemberAttribute>()

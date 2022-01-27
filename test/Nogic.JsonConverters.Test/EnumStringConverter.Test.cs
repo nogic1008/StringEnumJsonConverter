@@ -3,25 +3,35 @@ using System.Text.Json.Serialization;
 
 namespace Nogic.JsonConverters.Test;
 
-/// <summary>Unit test of <see cref="EnumStringConverter"/></summary>
+/// <summary>Unit test of <see cref="EnumStringConverterFactory"/> and <see cref="EnumStringConverter{T}"/></summary>
 public sealed class EnumStringConverterTest
 {
     /// <summary>
-    /// Create <see cref="JsonSerializerOptions"/> that contains <see cref="EnumStringConverter"/>.
+    /// Create <see cref="JsonSerializerOptions"/> that contains <see cref="EnumStringConverterFactory"/>.
     /// </summary>
     /// <param name="allowInteger">
-    /// <inheritdoc cref="EnumStringConverter(bool, JsonNamingPolicy?)" path="/param[@name='allowIntegerValues']"/>
+    /// <inheritdoc cref="EnumStringConverterFactory(bool, JsonNamingPolicy?)" path="/param[@name='allowIntegerValues']"/>
     /// </param>
     /// <param name="useCamelCase">Use <see cref="JsonNamingPolicy.CamelCase"/> or not.</param>
     private static JsonSerializerOptions CreateOption(bool allowInteger, bool useCamelCase)
         => new()
         {
-            Converters = { new EnumStringConverter(allowInteger, useCamelCase ? JsonNamingPolicy.CamelCase : null) }
+            Converters = { new EnumStringConverterFactory(allowInteger, useCamelCase ? JsonNamingPolicy.CamelCase : null) }
         };
 
-    /// <summary>For <see cref="EnumStringConverter{TEnum}.CanConvert(Type)"/> testing</summary>
-    private enum TestEnumOver64
+    /// <summary>For <see langword="sbyte"/> based testing</summary>
+    private enum TestEnumSByte : sbyte { Min = sbyte.MinValue, One = 1, Max = sbyte.MaxValue }
+    /// <summary>For <see langword="byte"/> based testing</summary>
+    private enum TestEnumByte : byte { Min = byte.MinValue, One = 1, Max = byte.MaxValue }
+    /// <summary>For <see langword="short"/> based testing</summary>
+    private enum TestEnumInt16 : short { Min = short.MinValue, One = 1, Max = short.MaxValue }
+    /// <summary>For <see langword="ushort"/> based testing</summary>
+    private enum TestEnumUInt16 : ushort { Min = ushort.MinValue, One = 1, Max = ushort.MaxValue }
+    /// <summary>For <see langword="int"/> based testing</summary>
+    private enum TestEnumInt32 : int
     {
+        Min = int.MinValue,
+        One = 1,
         A1, A2, A3, A4, A5, A6, A7, A8, A9, A0,
         B1, B2, B3, B4, B5, B6, B7, B8, B9, B0,
         C1, C2, C3, C4, C5, C6, C7, C8, C9, C0,
@@ -29,25 +39,41 @@ public sealed class EnumStringConverterTest
         E1, E2, E3, E4, E5, E6, E7, E8, E9, E0,
         F1, F2, F3, F4, F5, F6, F7, F8, F9, F0,
         G1, G2, G3, G4, G5, G6, G7, G8, G9, G0,
+        Max = int.MaxValue,
     }
+    /// <summary>For <see langword="uint"/> based testing</summary>
+    private enum TestEnumUInt32 : uint { Min = uint.MinValue, One = 1, Max = uint.MaxValue }
+    /// <summary>For <see langword="long"/> based testing</summary>
+    private enum TestEnumInt64 : long { Min = long.MinValue, One = 1, Max = long.MaxValue }
+    /// <summary>For <see langword="ulong"/> based testing</summary>
+    private enum TestEnumUInt64 : ulong { Min = ulong.MinValue, One = 1, Max = ulong.MaxValue }
 
     /// <summary>
-    /// <see cref="EnumStringConverter{TEnum}.CanConvert"/> returns <see langword="true"/>.
+    /// <see cref="EnumStringConverterFactory.CanConvert"/> returns <see langword="true"/>.
     /// </summary>
-    [Fact]
-    public void CanConvert_Returns_True()
-        => new EnumStringConverter<TestEnumOver64>().CanConvert(typeof(TestEnumOver64)).Should().BeTrue();
+    [Theory]
+    [InlineData(typeof(TestEnumSByte))]
+    [InlineData(typeof(TestEnumByte))]
+    [InlineData(typeof(TestEnumInt16))]
+    [InlineData(typeof(TestEnumUInt16))]
+    [InlineData(typeof(TestEnumInt32))]
+    [InlineData(typeof(TestEnumUInt32))]
+    [InlineData(typeof(TestEnumInt64))]
+    [InlineData(typeof(TestEnumUInt64))]
+    public void CanConvert_Returns_True(Type type)
+        => new EnumStringConverterFactory().CanConvert(type).Should().BeTrue();
 
     /// <summary>
-    /// <see cref="EnumStringConverter{TEnum}.CanConvert"/> returns <see langword="false"/>.
+    /// <see cref="EnumStringConverterFactory.CanConvert"/> returns <see langword="false"/>.
     /// </summary>
     /// <param name="type">Type to convert</param>
     [Theory]
     [InlineData(typeof(string))]
     [InlineData(typeof(int))]
-    [InlineData(typeof(TestForConvert))]
+    [InlineData(typeof(DateTime))]
+    [InlineData(typeof(TestEnumInt32?))]
     public void CanConvert_Returns_False(Type type)
-        => new EnumStringConverter<TestEnumOver64>().CanConvert(type).Should().BeFalse();
+        => new EnumStringConverterFactory().CanConvert(type).Should().BeFalse();
 
     /// <summary>For JSON serialize & deserialize testing</summary>
     [Flags]
@@ -165,23 +191,6 @@ public sealed class EnumStringConverterTest
         action.Should().Throw<JsonException>();
     }
 
-    /// <summary>For <see langword="sbyte"/> based testing</summary>
-    private enum TestEnumSByte : sbyte { Min = sbyte.MinValue, One = 1, Max = sbyte.MaxValue }
-    /// <summary>For <see langword="byte"/> based testing</summary>
-    private enum TestEnumByte : byte { Min = byte.MinValue, One = 1, Max = byte.MaxValue }
-    /// <summary>For <see langword="short"/> based testing</summary>
-    private enum TestEnumInt16 : short { Min = short.MinValue, One = 1, Max = short.MaxValue }
-    /// <summary>For <see langword="ushort"/> based testing</summary>
-    private enum TestEnumUInt16 : ushort { Min = ushort.MinValue, One = 1, Max = ushort.MaxValue }
-    /// <summary>For <see langword="int"/> based testing</summary>
-    private enum TestEnumInt32 : int { Min = int.MinValue, One = 1, Max = int.MaxValue }
-    /// <summary>For <see langword="uint"/> based testing</summary>
-    private enum TestEnumUInt32 : uint { Min = uint.MinValue, One = 1, Max = uint.MaxValue }
-    /// <summary>For <see langword="long"/> based testing</summary>
-    private enum TestEnumInt64 : long { Min = long.MinValue, One = 1, Max = long.MaxValue }
-    /// <summary>For <see langword="ulong"/> based testing</summary>
-    private enum TestEnumUInt64 : ulong { Min = ulong.MinValue, One = 1, Max = ulong.MaxValue }
-
     /// <summary>
     /// <see cref="EnumStringConverter{TEnum}.Write"/> writes <paramref name="expected"/>.
     /// </summary>
@@ -204,14 +213,14 @@ public sealed class EnumStringConverterTest
     [InlineData(TestEnumUInt32.One, "\"One\"")]
     [InlineData(TestEnumInt64.One, "\"One\"")]
     [InlineData(TestEnumUInt64.One, "\"One\"")]
-    [InlineData((TestEnumSByte)2, "2")]
-    [InlineData((TestEnumByte)2, "2")]
-    [InlineData((TestEnumInt16)2, "2")]
-    [InlineData((TestEnumUInt16)2, "2")]
-    [InlineData((TestEnumInt32)2, "2")]
-    [InlineData((TestEnumUInt32)2, "2")]
-    [InlineData((TestEnumInt64)2, "2")]
-    [InlineData((TestEnumUInt64)2, "2")]
+    [InlineData((TestEnumSByte)100, "100")]
+    [InlineData((TestEnumByte)100, "100")]
+    [InlineData((TestEnumInt16)100, "100")]
+    [InlineData((TestEnumUInt16)100, "100")]
+    [InlineData((TestEnumInt32)100, "100")]
+    [InlineData((TestEnumUInt32)100, "100")]
+    [InlineData((TestEnumInt64)100, "100")]
+    [InlineData((TestEnumUInt64)100, "100")]
     [InlineData(TestEnumSByte.Max, "\"Max\"")]
     [InlineData(TestEnumByte.Max, "\"Max\"")]
     [InlineData(TestEnumInt16.Max, "\"Max\"")]

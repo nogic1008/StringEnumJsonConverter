@@ -24,10 +24,6 @@ public class BlankNullableConverter<T> : JsonConverter<T?> where T : struct
 
     /// <inheritdoc/>
     public override void Write(Utf8JsonWriter writer, T? value, JsonSerializerOptions options)
-    {
-        if (!value.HasValue)
-            writer.WriteStringValue("");
-        else
-            _converter.Write(writer, value.Value, options);
-    }
+        // If value is null, this method is not called.
+        => _converter.Write(writer, value.GetValueOrDefault(), options);
 }

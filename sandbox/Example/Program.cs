@@ -6,7 +6,7 @@ using Nogic.JsonConverters;
 
 var options = new JsonSerializerOptions()
 {
-    Converters = { new DateOnlyConverter(), new TimeOnlyConverter(), new EnumStringConverter() }
+    Converters = { new DateOnlyConverter(), new TimeOnlyConverter(), new EnumStringConverterFactory() }
 };
 
 Console.WriteLine($"---------- {nameof(DateOnlyConverter)} ----------");
@@ -15,7 +15,7 @@ ConvertJson(DateOnly.FromDateTime(DateTime.Now), "\"2022-01-10\"");
 Console.WriteLine($"---------- {nameof(TimeOnlyConverter)} ----------");
 ConvertJson(TimeOnly.FromDateTime(DateTime.Now), "\"22:15:20.300\"");
 
-Console.WriteLine($"---------- {nameof(EnumStringConverter)} ----------");
+Console.WriteLine($"---------- {nameof(EnumStringConverterFactory)} ----------");
 ConvertJson(Status.None, "\"None\"");
 ConvertJson(Status.Running, "1");
 ConvertJson(Status.FatalError, "\"fatal_error\"");

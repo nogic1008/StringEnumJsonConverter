@@ -3,20 +3,20 @@ using System.Text.Json.Serialization;
 
 namespace Nogic.JsonConverters.Test;
 
-/// <summary>Unit test of <see cref="EnumStringConverter"/></summary>
+/// <summary>Unit test of <see cref="EnumStringConverterFactory"/> and <see cref="EnumStringConverter{T}"/></summary>
 public sealed class EnumStringConverterTest
 {
     /// <summary>
-    /// Create <see cref="JsonSerializerOptions"/> that contains <see cref="EnumStringConverter"/>.
+    /// Create <see cref="JsonSerializerOptions"/> that contains <see cref="EnumStringConverterFactory"/>.
     /// </summary>
     /// <param name="allowInteger">
-    /// <inheritdoc cref="EnumStringConverter(bool, JsonNamingPolicy?)" path="/param[@name='allowIntegerValues']"/>
+    /// <inheritdoc cref="EnumStringConverterFactory(bool, JsonNamingPolicy?)" path="/param[@name='allowIntegerValues']"/>
     /// </param>
     /// <param name="useCamelCase">Use <see cref="JsonNamingPolicy.CamelCase"/> or not.</param>
     private static JsonSerializerOptions CreateOption(bool allowInteger, bool useCamelCase)
         => new()
         {
-            Converters = { new EnumStringConverter(allowInteger, useCamelCase ? JsonNamingPolicy.CamelCase : null) }
+            Converters = { new EnumStringConverterFactory(allowInteger, useCamelCase ? JsonNamingPolicy.CamelCase : null) }
         };
 
     /// <summary>For <see cref="EnumStringConverter{TEnum}.CanConvert(Type)"/> testing</summary>

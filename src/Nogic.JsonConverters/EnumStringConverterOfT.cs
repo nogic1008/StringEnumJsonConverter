@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 
 namespace Nogic.JsonConverters;
 
-/// <inheritdoc cref="EnumStringConverter" />
+/// <inheritdoc cref="EnumStringConverterFactory"/>
 /// <typeparam name="TEnum"><see langword="enum"/> type</typeparam>
 public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : struct, Enum
 {
@@ -28,21 +28,21 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
     private readonly ConcurrentDictionary<string, TEnum> _valueCache = new();
 
     /// <summary>
-    /// <inheritdoc cref="EnumStringConverter(bool, JsonNamingPolicy?)" path="/param[@name='allowIntegerValues']"/>
+    /// <inheritdoc cref="EnumStringConverterFactory(bool, JsonNamingPolicy?)" path="/param[@name='allowIntegerValues']"/>
     /// </summary>
     private readonly bool _allowIntegerValues;
 
     /// <summary>
-    /// <inheritdoc cref="EnumStringConverter(bool, JsonNamingPolicy?)" path="/param[@name='namingPolicy']"/>
+    /// <inheritdoc cref="EnumStringConverterFactory(bool, JsonNamingPolicy?)" path="/param[@name='namingPolicy']"/>
     /// </summary>
     private readonly JsonNamingPolicy? _namingPolicy;
 
     /// <summary>Initializes a new instance of <see cref="EnumStringConverter{TEnum}"/>.</summary>
     /// <param name="allowIntegerValues">
-    /// <inheritdoc cref="EnumStringConverter(bool, JsonNamingPolicy?)" path="/param[@name='allowIntegerValues']"/>
+    /// <inheritdoc cref="EnumStringConverterFactory(bool, JsonNamingPolicy?)" path="/param[@name='allowIntegerValues']"/>
     /// </param>
     /// <param name="namingPolicy">
-    /// <inheritdoc cref="EnumStringConverter(bool, JsonNamingPolicy?)" path="/param[@name='namingPolicy']"/>
+    /// <inheritdoc cref="EnumStringConverterFactory(bool, JsonNamingPolicy?)" path="/param[@name='namingPolicy']"/>
     /// </param>
     /// <param name="serializerOptions">The serialization options to use.</param>
     public EnumStringConverter(bool allowIntegerValues = true, JsonNamingPolicy? namingPolicy = null, JsonSerializerOptions? serializerOptions = null)

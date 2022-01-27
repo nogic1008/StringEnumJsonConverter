@@ -1,6 +1,6 @@
 namespace Nogic.JsonConverters;
 
-/// <summary>Json converter for <see cref="Nullable{T}"/> that treats "" as <see langword="null"/>.</summary>
+/// <inheritdoc cref="BlankNullableConverterFactory" />
 /// <typeparam name="T">struct value type</typeparam>
 public class BlankNullableConverter<T> : JsonConverter<T?> where T : struct
 {

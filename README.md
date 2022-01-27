@@ -18,9 +18,13 @@ For use, see [Register a custom converter](https://docs.microsoft.com/dotnet/sta
 
 Implementation of `JsonConverter<DateOnly>` and `JsonConverter<TimeOnly>`.
 
-#### `EnumStringConverter`
+#### `EnumStringConverterFactory`, `EnumStringConverter<T>`
 
-Implementation of `JsonConverterFactory` for `enum` that uses [`EnumMemberAttribute`](https://docs.microsoft.com/dotnet/api/system.runtime.serialization.enummemberattribute)
+Implementation of `JsonConverterFactory` for `enum` that uses `JsonPropertyNameAttribute` and [`EnumMemberAttribute`](https://docs.microsoft.com/dotnet/api/system.runtime.serialization.enummemberattribute)
+
+#### `BlankNullableConverterFactory`, `BlankNullableConverter<T>`
+
+Implementation of `JsonConverterFactory` for `Nullable<T>` that treats `""` as `null`.
 
 ### JsonNamingPolicy
 

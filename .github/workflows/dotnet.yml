@@ -30,7 +30,7 @@ jobs:
         run: dotnet format --verify-no-changes --verbosity detailed
 
   restore:
-    name: Update NuGet lock file
+    name: Update NuGet Lock Files
     if: contains(github.actor, '[bot]') && github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:

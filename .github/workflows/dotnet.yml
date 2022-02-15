@@ -53,6 +53,10 @@ jobs:
 
       - name: Restore
         run: dotnet restore --force-evaluate
+      - name: Run ECLint
+        run: |
+          npm install -g eclint
+          eclint fix "**/packages.lock.json"
       - name: Diff
         id: diff
         continue-on-error: true

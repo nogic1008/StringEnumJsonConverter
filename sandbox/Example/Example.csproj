@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
     <IsPackable>false</IsPackable>
-    <NoWarn>RCS1110</NoWarn>
+    <NoWarn>RCS1110;CS0618</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

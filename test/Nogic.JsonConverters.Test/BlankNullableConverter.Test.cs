@@ -47,8 +47,8 @@ public class BlankNullableConverterTest
 
         void AssertSerialize<T>(T value, string expected) where T : struct
         {
-            JsonSerializer.Serialize<T?>(new T?(), _options).Should().Be("null");
-            JsonSerializer.Serialize<T?>(value, _options).Should().Be(expected);
+            _ = JsonSerializer.Serialize<T?>(new T?(), _options).Should().Be("null");
+            _ = JsonSerializer.Serialize<T?>(value, _options).Should().Be(expected);
         }
     }
 
@@ -64,9 +64,9 @@ public class BlankNullableConverterTest
 
         void AssertDeserialize<T>(string json, T expected) where T : struct
         {
-            JsonSerializer.Deserialize<T?>("null", _options).Should().BeNull();
-            JsonSerializer.Deserialize<T?>("\"\"", _options).Should().BeNull();
-            JsonSerializer.Deserialize<T?>(json, _options).Should().Be(expected);
+            _ = JsonSerializer.Deserialize<T?>("null", _options).Should().BeNull();
+            _ = JsonSerializer.Deserialize<T?>("\"\"", _options).Should().BeNull();
+            _ = JsonSerializer.Deserialize<T?>(json, _options).Should().Be(expected);
         }
     }
 }

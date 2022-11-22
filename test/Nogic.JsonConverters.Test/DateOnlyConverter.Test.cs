@@ -46,7 +46,7 @@ public class DateOnlyConverterTest
         var action = () => JsonSerializer.Deserialize<DateOnly>(json, CreateOption(format));
 
         // Assert
-        action.Should().Throw<FormatException>();
+        _ = action.Should().Throw<FormatException>();
     }
 
     /// <summary>

@@ -5,6 +5,9 @@ using System.Runtime.Serialization;
 
 namespace Nogic.JsonConverters;
 
+// disable switch pattern warnings
+#pragma warning disable IDE0072
+
 /// <inheritdoc cref="EnumStringConverterFactory"/>
 /// <typeparam name="TEnum"><see langword="enum"/> type</typeparam>
 public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : struct, Enum
@@ -124,7 +127,7 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
         if (IsValidIdentifier(original))
         {
             string converted = ConvertName(original);
-            TryAddNameCache(key, converted, options);
+            _ = TryAddNameCache(key, converted, options);
             writer.WriteStringValue(converted);
             return;
         }
@@ -174,7 +177,7 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
         if (_nameCache.Count >= NameCacheSizeSoftLimit)
             return false;
         var encoder = options?.Encoder;
-        _nameCache.TryAdd(key, JsonEncodedText.Encode(name, encoder));
+        _ = _nameCache.TryAdd(key, JsonEncodedText.Encode(name, encoder));
         return true;
     }
 

@@ -47,7 +47,7 @@ public class TimeOnlyConverterTest
         var action = () => JsonSerializer.Deserialize<TimeOnly>(json, CreateOption(format));
 
         // Assert
-        action.Should().Throw<FormatException>();
+        _ = action.Should().Throw<FormatException>();
     }
 
     /// <summary>

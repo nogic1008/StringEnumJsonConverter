@@ -128,7 +128,7 @@ public sealed class EnumStringConverterTest
     public void CannotSerializeJson(bool allowInteger, bool useCamelCase, TestForConvert @enum)
     {
         var action = () => JsonSerializer.Serialize(@enum, CreateOption(allowInteger, useCamelCase));
-        action.Should().Throw<JsonException>();
+        _ = action.Should().Throw<JsonException>();
     }
 
     /// <summary>
@@ -188,7 +188,7 @@ public sealed class EnumStringConverterTest
     public void CannotDeserializeJson(bool allowInteger, bool useCamelCase, string json)
     {
         var action = () => JsonSerializer.Deserialize<TestForConvert>(json, CreateOption(allowInteger, useCamelCase));
-        action.Should().Throw<JsonException>();
+        _ = action.Should().Throw<JsonException>();
     }
 
     /// <summary>

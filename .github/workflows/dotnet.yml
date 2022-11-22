@@ -15,6 +15,10 @@ env:
   DOTNET_NOLOGO: true
   NUGET_XMLDOC_MODE: skip
   NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+  DOTNET_VERSION: |
+    3.1.x
+    6.x
+    7.x
 
 jobs:
   lint:
@@ -30,48 +34,16 @@ jobs:
         run: dotnet format --verify-no-changes --verbosity detailed
 
   restore:
-    name: Update NuGet Lock Files
-    if: contains(github.actor, '[bot]') && github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3.1.0
-        with:
-          ref: ${{ github.head_ref }}
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-      - uses: actions/cache@v3.0.11
-        with:
-          path: ${{ env.NUGET_PACKAGES }}
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget-
-      - name: Setup .NET Core 3.1 SDK
-        uses: actions/setup-dotnet@v3.0.3
-        with:
-          dotnet-version: 3.1.x
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v3.0.3
-
-      - name: Restore
-        run: dotnet restore --force-evaluate
-      - name: Run ECLint
-        run: |
-          npm install -g eclint
-          eclint fix "**/packages.lock.json"
-      - name: Diff
-        id: diff
-        continue-on-error: true
-        run: |
-          git add -N .
-          git diff --name-only --exit-code
-
-      - name: Commit & Push
-        if: steps.diff.outcome == 'failure'
-        run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git add .
-          git commit -m "chore(deps): update NuGet lock file"
-          git push
+    name: Validate NuGet Lock Files
+    uses: nogic1008/actions/.github/workflows/nuget-lock-files.yml@v1.0.0
+    with:
+      update-lock-files: ${{ contains(github.head_ref, 'dependabot') && github.event_name == 'pull_request' }}
+      dotnet-version: |
+        3.1.x
+        6.x
+        7.x
+    secrets:
+      PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
   test:
     name: Debug Build & Test
@@ -88,15 +60,13 @@ jobs:
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
           restore-keys: |
             ${{ runner.os }}-nuget-
-      - name: Setup .NET Core 3.1 SDK
-        uses: actions/setup-dotnet@v3.0.3
-        with:
-          dotnet-version: 3.1.x
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v3.0.3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Restore
-        run: dotnet restore --locked-mode
+        run: dotnet restore
       - name: Build
         run: dotnet build --no-restore
       - name: Test

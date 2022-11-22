@@ -11,8 +11,10 @@ public class TimeOnlyConverterTest
     /// <param name="format">
     /// <inheritdoc cref="TimeOnlyConverter(string, IFormatProvider?)" path="/param[@name='serializationFormat']"/>
     /// </param>
+#pragma warning disable CS0618
     private static JsonSerializerOptions CreateOption(string format)
         => new() { Converters = { new TimeOnlyConverter(format, CultureInfo.InvariantCulture) } };
+#pragma warning restore
 
     /// <summary>
     /// <see cref="TimeOnlyConverter.Read"/> returns expected <see cref="TimeOnly"/> object.

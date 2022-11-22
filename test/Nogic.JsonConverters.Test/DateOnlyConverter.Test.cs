@@ -11,8 +11,10 @@ public class DateOnlyConverterTest
     /// <param name="format">
     /// <inheritdoc cref="DateOnlyConverter(string, IFormatProvider?)" path="/param[@name='serializationFormat']"/>
     /// </param>
+#pragma warning disable CS0618
     private static JsonSerializerOptions CreateOption(string format)
         => new() { Converters = { new DateOnlyConverter(format, CultureInfo.InvariantCulture) } };
+#pragma warning restore
 
     /// <summary>
     /// <see cref="DateOnlyConverter.Read"/> returns expected <see cref="DateOnly"/> object.
@@ -44,7 +46,7 @@ public class DateOnlyConverterTest
         var action = () => JsonSerializer.Deserialize<DateOnly>(json, CreateOption(format));
 
         // Assert
-        action.Should().Throw<FormatException>();
+        _ = action.Should().Throw<FormatException>();
     }
 
     /// <summary>

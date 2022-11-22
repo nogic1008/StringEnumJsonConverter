@@ -1,6 +1,9 @@
 namespace Nogic.JsonConverters;
 
 /// <summary>Json converter for <see cref="DateOnly"/>.</summary>
+#if NET7_0_OR_GREATER
+[Obsolete("Use internal System.Text.Json.Serialization.Converters.DateOnlyConverter instead.")]
+#endif
 public class DateOnlyConverter : JsonConverter<DateOnly>
 {
     /// <summary>

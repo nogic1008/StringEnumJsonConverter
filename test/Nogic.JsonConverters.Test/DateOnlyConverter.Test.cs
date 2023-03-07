@@ -3,7 +3,7 @@ using System.Globalization;
 namespace Nogic.JsonConverters.Test;
 
 /// <summary>Unit test of <see cref="DateOnlyConverter"/></summary>
-public class DateOnlyConverterTest
+public sealed class DateOnlyConverterTest
 {
     /// <summary>
     /// Create <see cref="JsonSerializerOptions"/> that contains <see cref="DateOnlyConverter"/>.

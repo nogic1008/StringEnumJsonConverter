@@ -3,7 +3,7 @@ namespace Nogic.JsonConverters.Test;
 /// <summary>
 /// Test for <see cref="BlankNullableConverterFactory"/> and <see cref="BlankNullableConverter{T}"/>.
 /// </summary>
-public class BlankNullableConverterTest
+public sealed class BlankNullableConverterTest
 {
     private readonly JsonSerializerOptions _options = new()
     {

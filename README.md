@@ -16,6 +16,8 @@ For use, see [Register a custom converter](https://docs.microsoft.com/dotnet/sta
 
 #### `DateOnlyConverter`, `TimeOnlyConverter`
 
+> *Obsolete: Use built-in [`DateOnlyConverter`](https://github.com/dotnet/runtime/blob/v7.0.0/src/libraries/System.Text.Json/src/System/Text/Json/Serialization/Converters/Value/DateOnlyConverter.cs) and [`TimeOnlyConverter`](https://github.com/dotnet/runtime/blob/v7.0.0/src/libraries/System.Text.Json/src/System/Text/Json/Serialization/Converters/Value/TimeOnlyConverter.cs) on System.Text.Json@7.0.0 or higher.*
+
 Implementation of `JsonConverter<DateOnly>` and `JsonConverter<TimeOnly>`.
 
 #### `EnumStringConverterFactory`, `EnumStringConverter<T>`
@@ -27,6 +29,8 @@ Implementation of `JsonConverterFactory` for `enum` that uses `JsonPropertyNameA
 Implementation of `JsonConverterFactory` for `Nullable<T>` that treats `""` as `null`.
 
 ### JsonNamingPolicy
+
+> *Obsolete: Use built-in [`JsonNamingPolicy`](https://learn.microsoft.com/ja-jp/dotnet/api/system.text.json.jsonnamingpolicy) on System.Text.Json@8.0.0 or higher.*
 
 See also [Use a custom JSON property naming policy](https://docs.microsoft.com/dotnet/standard/serialization/system-text-json-customize-properties#use-a-custom-json-property-naming-policy).
 

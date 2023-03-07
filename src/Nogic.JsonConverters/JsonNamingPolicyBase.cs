@@ -90,39 +90,3 @@ public abstract class JsonNamingPolicyBase : JsonNamingPolicy
         return new string(buf);
     }
 }
-
-/// <summary>Naming policy for lower_snake_casing.</summary>
-public sealed class JsonLowerSnakeCaseNamingPolicy : JsonNamingPolicyBase
-{
-    /// <summary>
-    /// Initializes a new instance of <see cref="JsonLowerSnakeCaseNamingPolicy"/>
-    /// </summary>
-    public JsonLowerSnakeCaseNamingPolicy() : base('_') { }
-
-    /// <inheritdoc/>
-    protected override char ConvertForWrite(bool isTopOfWord, char c) => char.ToLowerInvariant(c);
-}
-
-/// <summary>Naming policy for UPPER_SNAKE_CASING.</summary>
-public sealed class JsonUpperSnakeCaseNamingPolicy : JsonNamingPolicyBase
-{
-    /// <summary>
-    /// Initializes a new instance of <see cref="JsonUpperSnakeCaseNamingPolicy"/>
-    /// </summary>
-    public JsonUpperSnakeCaseNamingPolicy() : base('_') { }
-
-    /// <inheritdoc/>
-    protected override char ConvertForWrite(bool isTopOfWord, char c) => char.ToUpperInvariant(c);
-}
-
-/// <summary>Naming policy for kebab-casing.</summary>
-public sealed class JsonKebabCaseNamingPolicy : JsonNamingPolicyBase
-{
-    /// <summary>
-    /// Initializes a new instance of <see cref="JsonKebabCaseNamingPolicy"/>
-    /// </summary>
-    public JsonKebabCaseNamingPolicy() : base('-') { }
-
-    /// <inheritdoc/>
-    protected override char ConvertForWrite(bool isTopOfWord, char c) => char.ToLowerInvariant(c);
-}

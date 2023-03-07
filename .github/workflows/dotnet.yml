@@ -16,7 +16,6 @@ env:
   NUGET_XMLDOC_MODE: skip
   NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
   DOTNET_VERSION: |
-    3.1.x
     6.x
     7.x
 
@@ -39,7 +38,6 @@ jobs:
     with:
       update-lock-files: ${{ contains(github.head_ref, 'dependabot') && github.event_name == 'pull_request' }}
       dotnet-version: |
-        3.1.x
         6.x
         7.x
     secrets:
@@ -52,6 +50,10 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
+        framework: [net6.0, net7.0]
+        include:
+          - os: windows-latest
+            framework: net48
     steps:
       - uses: actions/checkout@v3.3.0
       - uses: actions/cache@v3.2.6
@@ -70,9 +72,10 @@ jobs:
       - name: Build
         run: dotnet build --no-restore
       - name: Test
-        run: dotnet test --no-build --settings coverlet.runsettings
+        run: dotnet test -f ${{ matrix.framework }} --no-build --settings coverlet.runsettings
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3.1.1
         with:
-          flags: ${{ runner.os }}
+          flags: ${{ runner.os }},${{ matrix.framework }}
+          file: "*.opencover.xml"

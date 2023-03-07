@@ -35,7 +35,7 @@ options = new() { PropertyNamingPolicy = new JsonKebabCaseNamingPolicy() };
 json = /*lang=json,strict*/ "{\"id\":6, \"name\":\"User 6\", \"mail-address\":\"user06@example.com\"}";
 ConvertJson(new User(5, "User 5", "user05@example.com"), json);
 
-void ConvertJson<T>(T value, string json, [CallerArgumentExpression("value")] string? arg = null)
+void ConvertJson<T>(T value, string json, [CallerArgumentExpression(nameof(value))] string? arg = null)
 {
     string typeName = typeof(T).ToString().Split('.')[^1];
     Console.WriteLine($"Serialize({arg})");

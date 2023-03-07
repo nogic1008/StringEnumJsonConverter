@@ -51,6 +51,7 @@ public sealed class EnumStringConverterTest
     /// <summary>
     /// <see cref="EnumStringConverterFactory.CanConvert"/> returns <see langword="true"/>.
     /// </summary>
+    /// <param name="type">Type of enum</param>
     [Theory]
     [InlineData(typeof(TestEnumSByte))]
     [InlineData(typeof(TestEnumByte))]

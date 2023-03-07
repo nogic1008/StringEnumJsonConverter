@@ -5,7 +5,7 @@ namespace Nogic.JsonConverters.Test;
 /// </summary>
 public sealed class BlankNullableConverterTest
 {
-    private readonly JsonSerializerOptions _options = new()
+    private static readonly JsonSerializerOptions _options = new()
     {
         Converters = { new BlankNullableConverterFactory() }
     };
@@ -35,38 +35,46 @@ public sealed class BlankNullableConverterTest
     public void CanConvert_Returns_False(Type type)
         => new BlankNullableConverterFactory().CanConvert(type).Should().BeFalse();
 
-    /// <summary>
-    /// <see cref="BlankNullableConverter{T}.Write"/> writes expected string.
-    /// </summary>
-    [Fact]
-    public void CanSerializeJson()
+    /// <summary>Test data for <see cref="CanSerializeJson"/></summary>
+    public static IEnumerable<object[]> TestData_CanSerializeJson => new[]
     {
-        AssertSerialize(1, "1");
-        AssertSerialize(TypeCode.Decimal, "15");
-        AssertSerialize(new DateTimeOffset(2022, 1, 26, 10, 0, 27, 0, TimeSpan.Zero), "\"2022-01-26T10:00:27+00:00\"");
-
-        void AssertSerialize<T>(T value, string expected) where T : struct
-        {
-            _ = JsonSerializer.Serialize<T?>(new T?(), _options).Should().Be("null");
-            _ = JsonSerializer.Serialize<T?>(value, _options).Should().Be(expected);
-        }
+        new object[]{ 1, "1" },
+        new object[]{ TypeCode.Decimal, "15" },
+        new object[]{ new DateTimeOffset(2022, 1, 26, 10, 0, 27, 0, TimeSpan.Zero), "\"2022-01-26T10:00:27+00:00\"" },
+    };
+    /// <summary>
+    /// <see cref="BlankNullableConverter{T}.Write"/> writes expected JSON string.
+    /// </summary>
+    /// <typeparam name="T">Type of <paramref name="value"/></typeparam>
+    /// <param name="value">serialize target</param>
+    /// <param name="expectedJson">expected JSON string</param>
+    [Theory]
+    [MemberData(nameof(TestData_CanSerializeJson))]
+    public void CanSerializeJson<T>(T value, string expectedJson) where T : struct
+    {
+        _ = JsonSerializer.Serialize(new T?(), _options).Should().Be("null");
+        _ = JsonSerializer.Serialize<T?>(value, _options).Should().Be(expectedJson);
     }
 
-    /// <summary>
-    /// <see cref="BlankNullableConverter{T}.Read"/>
-    /// </summary>
-    [Fact]
-    public void CanDeserializeJson()
+    /// <summary>Test data for <see cref="CanDeserializeJson"/></summary>
+    public static IEnumerable<object[]> TestData_CanDeserializeJson => new[]
     {
-        AssertDeserialize("1", 1);
-        AssertDeserialize("3", TypeCode.Boolean);
-        AssertDeserialize("\"2022-01-26T10:00:27+00:00\"", new DateTimeOffset(2022, 1, 26, 10, 0, 27, 0, TimeSpan.Zero));
-
-        void AssertDeserialize<T>(string json, T expected) where T : struct
-        {
-            _ = JsonSerializer.Deserialize<T?>("null", _options).Should().BeNull();
-            _ = JsonSerializer.Deserialize<T?>("\"\"", _options).Should().BeNull();
-            _ = JsonSerializer.Deserialize<T?>(json, _options).Should().Be(expected);
-        }
+        new object[]{ "1", 1 },
+        new object[]{ "3", TypeCode.Boolean },
+        new object[]{ "\"2022-01-26T10:00:27+00:00\"", new DateTimeOffset(2022, 1, 26, 10, 0, 27, 0, TimeSpan.Zero) },
+    };
+    /// <summary>
+    /// <see cref="BlankNullableConverter{T}.Read"/> returns expected value.
+    /// </summary>
+    /// <typeparam name="T">Type of <paramref name="expected"/></typeparam>
+    /// <param name="json">JSON string for deserialize</param>
+    /// <param name="expected">expected value</param>
+    [Theory]
+    [MemberData(nameof(TestData_CanDeserializeJson))]
+    public void CanDeserializeJson<T>(string json, T expected) where T : struct
+    {
+        _ = JsonSerializer.Deserialize<T?>("null", _options).Should().BeNull();
+        _ = JsonSerializer.Deserialize<T?>("\"\"", _options).Should().BeNull();
+        _ = JsonSerializer.Deserialize<T?>(json, _options).Should().Be(expected);
     }
 }

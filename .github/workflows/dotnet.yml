@@ -31,7 +31,7 @@ jobs:
 
   restore:
     name: Validate NuGet Lock Files
-    uses: nogic1008/actions/.github/workflows/nuget-lock-files.yml@v1.0.0
+    uses: nogic1008/actions/.github/workflows/nuget-lock-files.yml@v1.1.0
     with:
       update-lock-files: ${{ contains(github.head_ref, 'dependabot') && github.event_name == 'pull_request' }}
       dotnet-version: ${{ vars.DOTNET_SDK_VERSIONS }}

@@ -70,3 +70,4 @@ jobs:
         with:
           flags: ${{ runner.os }},${{ matrix.framework }}
           file: "*.opencover.xml"
+          token: ${{ secrets.CODECOV_TOKEN }}

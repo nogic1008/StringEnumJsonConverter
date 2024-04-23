@@ -94,8 +94,8 @@
       },
       "Portable.System.DateTimeOnly": {
         "type": "Transitive",
-        "resolved": "7.0.1",
-        "contentHash": "2X7BoEcSLwRJwfrmsNzL+5mhEyENa8YeL2goDdVhjG9lGaRgOGlRRNbfloIpS6FpvMtgYyADouLeFQNRKFNDiQ==",
+        "resolved": "8.0.0",
+        "contentHash": "2yoASdfgXvlB4ObVHc7I2zbuGPr2ZBH0aEd7TrWzuKugXteACnKARMOv7L8z967MV0n0JYbXNM/o+NIJDb1fDQ==",
         "dependencies": {
           "System.Memory": "4.5.5"
         }
@@ -191,7 +191,7 @@
       "nogic.jsonconverters": {
         "type": "Project",
         "dependencies": {
-          "Portable.System.DateTimeOnly": "[7.0.1, )"
+          "Portable.System.DateTimeOnly": "[8.0.0, )"
         }
       }
     },

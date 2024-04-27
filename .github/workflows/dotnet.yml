@@ -14,20 +14,16 @@ env:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   DOTNET_NOLOGO: true
   NUGET_XMLDOC_MODE: skip
-  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
-  DOTNET_VERSION: |
-    6.x
-    7.x
-    8.x
+  NUGET_PACKAGES: ${{ github.workspace }}/${{ vars.NUGET_GLOBAL_PACKAGES_FOLDER }}
 
 jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3.3.0
+      - uses: actions/checkout@v4.1.3
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v3.0.3
+        uses: actions/setup-dotnet@v4.0.0
       - name: Add Problem Matcher for dotnet-format
         uses: xt0rted/dotnet-format-problem-matcher@v1.2.0
       - name: Lint
@@ -35,13 +31,10 @@ jobs:
 
   restore:
     name: Validate NuGet Lock Files
-    uses: nogic1008/actions/.github/workflows/nuget-lock-files.yml@v1.0.0
+    uses: nogic1008/actions/.github/workflows/nuget-lock-files.yml@v1.1.0
     with:
       update-lock-files: ${{ contains(github.head_ref, 'dependabot') && github.event_name == 'pull_request' }}
-      dotnet-version: |
-        6.x
-        7.x
-        8.x
+      dotnet-version: ${{ vars.DOTNET_SDK_VERSIONS }}
     secrets:
       PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
@@ -57,17 +50,13 @@ jobs:
           - os: windows-latest
             framework: net48
     steps:
-      - uses: actions/checkout@v3.3.0
-      - uses: actions/cache@v3.2.6
-        with:
-          path: ${{ env.NUGET_PACKAGES }}
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget-
+      - uses: actions/checkout@v4.1.3
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v3.0.3
+        uses: actions/setup-dotnet@v4.0.0
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+          dotnet-version: ${{ vars.DOTNET_SDK_VERSIONS }}
+          cache: true
+          cache-dependency-path: '**/packages.lock.json'
 
       - name: Restore
         run: dotnet restore
@@ -77,7 +66,8 @@ jobs:
         run: dotnet test -f ${{ matrix.framework }} --no-build --settings coverlet.runsettings
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3.1.1
+        uses: codecov/codecov-action@v4.3.0
         with:
           flags: ${{ runner.os }},${{ matrix.framework }}
           file: "*.opencover.xml"
+          token: ${{ secrets.CODECOV_TOKEN }}

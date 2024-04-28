@@ -10,23 +10,14 @@ using System.Runtime.CompilerServices;
 namespace Nogic.JsonConverters;
 
 /// <summary>Helper for <see cref="JsonNamingPolicy"/></summary>
+/// <param name="lowercase">Lowercased or not</param>
+/// <param name="separator">Char separator</param>
 [EditorBrowsable(EditorBrowsableState.Never)]
-public abstract class JsonSeparatorNamingPolicy : JsonNamingPolicy
+public abstract class JsonSeparatorNamingPolicy(bool lowercase, char separator) : JsonNamingPolicy
 {
     // https://github.com/dotnet/runtime/blob/v8.0.0/src/libraries/System.Text.Json/Common/JsonConstants.cs
     private const int StackallocByteThreshold = 256;
     private const int StackallocCharThreshold = StackallocByteThreshold / 2;
-
-    private readonly bool _lowercase;
-    private readonly char _separator;
-
-    /// <summary>
-    /// Initializes a new instance of <see cref="JsonSeparatorNamingPolicy"/>.
-    /// </summary>
-    /// <param name="lowercase">Lowercased or not</param>
-    /// <param name="separator">Char separator</param>
-    protected JsonSeparatorNamingPolicy(bool lowercase, char separator) =>
-        (_lowercase, _separator) = (lowercase, separator);
 
     /// <inheritdoc/>
     public sealed override string ConvertName(string name)
@@ -37,7 +28,7 @@ public abstract class JsonSeparatorNamingPolicy : JsonNamingPolicy
         if (name is null)
             throw new ArgumentNullException(nameof(name));
 #endif
-        return ConvertNameCore(_separator, _lowercase, name.AsSpan());
+        return ConvertNameCore(separator, lowercase, name.AsSpan());
     }
 
     private static string ConvertNameCore(char separator, bool lowercase, ReadOnlySpan<char> chars)

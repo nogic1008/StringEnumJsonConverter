@@ -4,10 +4,4 @@ namespace Nogic.JsonConverters;
 #if NET8_0_OR_GREATER
 [Obsolete($"Use built-in {nameof(JsonNamingPolicy)}.{nameof(KebabCaseLower)}.")]
 #endif
-public sealed class JsonKebabCaseNamingPolicy : JsonSeparatorNamingPolicy
-{
-    /// <summary>
-    /// Initializes a new instance of <see cref="JsonKebabCaseNamingPolicy"/>
-    /// </summary>
-    public JsonKebabCaseNamingPolicy() : base(true, '-') { }
-}
+public sealed class JsonKebabCaseNamingPolicy() : JsonSeparatorNamingPolicy(true, '-');

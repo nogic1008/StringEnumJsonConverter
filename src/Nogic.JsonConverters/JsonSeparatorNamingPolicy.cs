@@ -1,10 +1,11 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// https://github.com/dotnet/runtime/blob/v8.0.0-preview.1.23110.8/src/libraries/System.Text.Json/Common/JsonSeparatorNamingPolicy.cs
+// https://github.com/dotnet/runtime/blob/v8.0.0/src/libraries/System.Text.Json/Common/JsonSeparatorNamingPolicy.cs
 
 using System.Buffers;
 using System.ComponentModel;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 
 namespace Nogic.JsonConverters;
 
@@ -12,7 +13,7 @@ namespace Nogic.JsonConverters;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public abstract class JsonSeparatorNamingPolicy : JsonNamingPolicy
 {
-    // https://github.com/dotnet/runtime/blob/v8.0.0-preview.1.23110.8/src/libraries/System.Text.Json/Common/JsonConstants.cs
+    // https://github.com/dotnet/runtime/blob/v8.0.0/src/libraries/System.Text.Json/Common/JsonConstants.cs
     private const int StackallocByteThreshold = 256;
     private const int StackallocCharThreshold = StackallocByteThreshold / 2;
 
@@ -30,141 +31,142 @@ public abstract class JsonSeparatorNamingPolicy : JsonNamingPolicy
     /// <inheritdoc/>
     public sealed override string ConvertName(string name)
     {
-        // Rented buffer 20% longer that the input.
-        int rentedBufferLength = 12 * name.Length / 10;
-        char[]? rentedBuffer = rentedBufferLength > StackallocCharThreshold
-            ? ArrayPool<char>.Shared.Rent(rentedBufferLength)
-            : null;
-
-        int resultUsedLength = 0;
-        Span<char> result = rentedBuffer ?? (stackalloc char[StackallocCharThreshold]);
-
-        void ExpandBuffer(ref Span<char> result)
-        {
-            char[] newBuffer = ArrayPool<char>.Shared.Rent(result.Length * 2);
-
-            result.CopyTo(newBuffer);
-
-            if (rentedBuffer is not null)
-            {
-                result[..resultUsedLength].Clear();
-                ArrayPool<char>.Shared.Return(rentedBuffer);
-            }
-
-            rentedBuffer = newBuffer;
-            result = rentedBuffer;
-        }
-
-        void WriteWord(ReadOnlySpan<char> word, ref Span<char> result)
-        {
-            if (word.IsEmpty)
-                return;
-
-            int written;
-            while (true)
-            {
-                int destinationOffset = resultUsedLength != 0
-                    ? resultUsedLength + 1
-                    : resultUsedLength;
-
-                if (destinationOffset < result.Length)
-                {
-                    var destination = result[destinationOffset..];
-
-                    written = _lowercase
-                        ? word.ToLowerInvariant(destination)
-                        : word.ToUpperInvariant(destination);
-
-                    if (written > 0)
-                        break;
-                }
-
-                ExpandBuffer(ref result);
-            }
-
-            if (resultUsedLength != 0)
-            {
-                result[resultUsedLength] = _separator;
-                resultUsedLength++;
-            }
-
-            resultUsedLength += written;
-        }
-
-        int first = 0;
-        var chars = name.AsSpan();
-        var previousCategory = CharCategory.Boundary;
-
-        for (int index = 0; index < chars.Length; index++)
-        {
-            char current = chars[index];
-            var currentCategoryUnicode = char.GetUnicodeCategory(current);
-
-            if (currentCategoryUnicode is UnicodeCategory.SpaceSeparator or
-                (>= UnicodeCategory.ConnectorPunctuation and
-                <= UnicodeCategory.OtherPunctuation))
-            {
-                WriteWord(chars[first..index], ref result);
-
-                previousCategory = CharCategory.Boundary;
-                first = index + 1;
-
-                continue;
-            }
-
-            if (index + 1 < chars.Length)
-            {
-                char next = chars[index + 1];
-                var currentCategory = currentCategoryUnicode switch
-                {
-                    UnicodeCategory.LowercaseLetter => CharCategory.Lowercase,
-                    UnicodeCategory.UppercaseLetter => CharCategory.Uppercase,
-                    _ => previousCategory
-                };
-
-                if ((currentCategory == CharCategory.Lowercase && char.IsUpper(next)) || next == '_')
-                {
-                    WriteWord(chars.Slice(first, index - first + 1), ref result);
-
-                    previousCategory = CharCategory.Boundary;
-                    first = index + 1;
-
-                    continue;
-                }
-
-                if (previousCategory == CharCategory.Uppercase &&
-                    currentCategoryUnicode == UnicodeCategory.UppercaseLetter &&
-                    char.IsLower(next))
-                {
-                    WriteWord(chars[first..index], ref result);
-
-                    previousCategory = CharCategory.Boundary;
-                    first = index;
-
-                    continue;
-                }
-
-                previousCategory = currentCategory;
-            }
-        }
-
-        WriteWord(chars[first..], ref result);
-
-        name = result[..resultUsedLength].ToString();
-
-        if (rentedBuffer is not null)
-        {
-            result[..resultUsedLength].Clear();
-            ArrayPool<char>.Shared.Return(rentedBuffer);
-        }
-
-        return name;
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(name);
+#else
+        if (name is null)
+            throw new ArgumentNullException(nameof(name));
+#endif
+        return ConvertNameCore(_separator, _lowercase, name.AsSpan());
     }
 
-    private enum CharCategory
+    private static string ConvertNameCore(char separator, bool lowercase, ReadOnlySpan<char> chars)
     {
-        Boundary = 0,
-        Lowercase = 1,
-        Uppercase = 2,
+        char[]? rentedBuffer = null;
+
+        // While we can't predict the expansion factor of the resultant string,
+        // start with a buffer that is at least 20% larger than the input.
+        int initialBufferLength = (int)(1.2 * chars.Length);
+        Span<char> destination = initialBufferLength <= StackallocCharThreshold
+            ? stackalloc char[StackallocCharThreshold]
+            : (rentedBuffer = ArrayPool<char>.Shared.Rent(initialBufferLength));
+
+        var state = SeparatorState.NotStarted;
+        int charsWritten = 0;
+
+        for (int i = 0; i < chars.Length; i++)
+        {
+            // NB this implementation does not handle surrogate pair letters
+            // cf. https://github.com/dotnet/runtime/issues/90352
+
+            char current = chars[i];
+            var category = char.GetUnicodeCategory(current);
+
+            switch (category)
+            {
+                case UnicodeCategory.UppercaseLetter:
+                    switch (state)
+                    {
+                        case SeparatorState.LowercaseLetterOrDigit:
+                        case SeparatorState.SpaceSeparator:
+                            // An uppercase letter following a sequence of lowercase letters or spaces
+                            // denotes the start of a new grouping: emit a separator character.
+                            WriteChar(separator, ref destination);
+                            break;
+                        case SeparatorState.UppercaseLetter:
+                            // We are reading through a sequence of two or more uppercase letters.
+                            // Uppercase letters are grouped together with the exception of the
+                            // final letter, assuming it is followed by lowercase letters.
+                            // For example, the value 'XMLReader' should render as 'xml_reader',
+                            // however 'SHA512Hash' should render as 'sha512-hash'.
+                            if (i + 1 < chars.Length && char.IsLower(chars[i + 1]))
+                                WriteChar(separator, ref destination);
+                            break;
+                        case SeparatorState.NotStarted:
+                        default:
+                            break;
+                    }
+
+                    if (lowercase)
+                        current = char.ToLowerInvariant(current);
+
+                    WriteChar(current, ref destination);
+                    state = SeparatorState.UppercaseLetter;
+                    break;
+
+                case UnicodeCategory.LowercaseLetter:
+                case UnicodeCategory.DecimalDigitNumber:
+
+                    // Normalize preceding spaces to one separator.
+                    if (state is SeparatorState.SpaceSeparator)
+                        WriteChar(separator, ref destination);
+
+                    if (!lowercase && category is UnicodeCategory.LowercaseLetter)
+                        current = char.ToUpperInvariant(current);
+
+                    WriteChar(current, ref destination);
+                    state = SeparatorState.LowercaseLetterOrDigit;
+                    break;
+
+                case UnicodeCategory.SpaceSeparator:
+                    // Space characters are trimmed from the start and end of the input string
+                    // but are normalized to separator characters if between letters.
+                    if (state != SeparatorState.NotStarted)
+                        state = SeparatorState.SpaceSeparator;
+                    break;
+
+                default:
+                    // Non-alphanumeric characters (including the separator character and surrogates)
+                    // are written as-is to the output and reset the separator state.
+                    // E.g. 'ABC???def' maps to 'abc???def' in snake_case.
+
+                    WriteChar(current, ref destination);
+                    state = SeparatorState.NotStarted;
+                    break;
+            }
+        }
+
+        string result = destination[..charsWritten].ToString();
+
+        ReturnSharedBuffer(ref destination);
+
+        return result;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        void WriteChar(char value, ref Span<char> destination)
+        {
+            if (charsWritten == destination.Length)
+                ExpandBuffer(ref destination);
+
+            destination[charsWritten++] = value;
+        }
+
+        void ExpandBuffer(ref Span<char> destination)
+        {
+            int newSize = checked(destination.Length * 2);
+            char[] newBuffer = ArrayPool<char>.Shared.Rent(newSize);
+            destination.CopyTo(newBuffer);
+
+            ReturnSharedBuffer(ref destination);
+
+            rentedBuffer = newBuffer;
+            destination = rentedBuffer;
+        }
+
+        void ReturnSharedBuffer(ref Span<char> destination)
+        {
+            if (rentedBuffer is null)
+                return;
+            destination[..charsWritten].Clear();
+            ArrayPool<char>.Shared.Return(rentedBuffer);
+        }
+    }
+
+    private enum SeparatorState
+    {
+        NotStarted,
+        UppercaseLetter,
+        LowercaseLetterOrDigit,
+        SpaceSeparator,
     }
 }

@@ -36,13 +36,6 @@ public sealed class BlankNullableConverterTest
     public void CanConvert_Returns_False(Type type)
         => new BlankNullableConverterFactory().CanConvert(type).Should().BeFalse();
 
-    /// <summary>Test data for <see cref="CanSerializeJson"/></summary>
-    public static IEnumerable<object[]> TestData_CanSerializeJson => new[]
-    {
-        new object[]{ 1, "1" },
-        new object[]{ TypeCode.Decimal, "15" },
-        new object[]{ new DateTimeOffset(2022, 1, 26, 10, 0, 27, 0, TimeSpan.Zero), "\"2022-01-26T10:00:27+00:00\"" },
-    };
     /// <summary>
     /// <see cref="BlankNullableConverter{T}.Write"/> writes expected JSON string.
     /// </summary>
@@ -65,13 +58,6 @@ public sealed class BlankNullableConverterTest
         _ = JsonSerializer.Serialize(new DateTimeOffset(2022, 1, 26, 10, 0, 27, 0, TimeSpan.Zero), _options).Should().Be("\"2022-01-26T10:00:27+00:00\"");
     }
 
-    /// <summary>Test data for <see cref="CanDeserializeJson"/></summary>
-    public static IEnumerable<object[]> TestData_CanDeserializeJson => new[]
-    {
-        new object[]{ "1", 1 },
-        new object[]{ "3", TypeCode.Boolean },
-        new object[]{ "\"2022-01-26T10:00:27+00:00\"", new DateTimeOffset(2022, 1, 26, 10, 0, 27, 0, TimeSpan.Zero) },
-    };
     /// <summary>
     /// <see cref="BlankNullableConverter{T}.Read"/> returns expected value.
     /// </summary>

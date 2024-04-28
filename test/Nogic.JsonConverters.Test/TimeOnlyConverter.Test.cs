@@ -3,6 +3,7 @@ using System.Globalization;
 namespace Nogic.JsonConverters.Test;
 
 /// <summary>Unit test of <see cref="TimeOnlyConverter"/></summary>
+[TestClass]
 public class TimeOnlyConverterTest
 {
     /// <summary>
@@ -25,10 +26,10 @@ public class TimeOnlyConverterTest
     /// <inheritdoc cref="TimeOnly(int, int, int, int)" path="/param[@name='minute']"/>
     /// <inheritdoc cref="TimeOnly(int, int, int, int)" path="/param[@name='second']"/>
     /// <inheritdoc cref="TimeOnly(int, int, int, int)" path="/param[@name='millisecond']"/>
-    [Theory]
-    [InlineData("HH:mm:ss.fff", "\"22:30:30.300\"", 22, 30, 30, 300)]
-    [InlineData("hh:mm:ss tt", "\"10:00:00 PM\"", 22, 0, 0, 0)]
-    [InlineData("HHmm", "\"2200\"", 22, 0, 0, 0)]
+    [TestMethod]
+    [DataRow("HH:mm:ss.fff", "\"22:30:30.300\"", 22, 30, 30, 300)]
+    [DataRow("hh:mm:ss tt", "\"10:00:00 PM\"", 22, 0, 0, 0)]
+    [DataRow("HHmm", "\"2200\"", 22, 0, 0, 0)]
     public void CanDeserializeJson(string format, string json, int hour, int minute, int second, int millisecond)
         => JsonSerializer.Deserialize<TimeOnly>(json, CreateOption(format)).Should().Be(new(hour, minute, second, millisecond));
 
@@ -37,10 +38,10 @@ public class TimeOnlyConverterTest
     /// </summary>
     /// <inheritdoc cref="CreateOption" path="/param[@name='format']"/>
     /// <param name="json">JSON string</param>
-    [Theory]
-    [InlineData("HH:mm:ss.fff", "\"10:00:00 PM\"")]
-    [InlineData("hh:mm:ss tt", "\"22:30:30\"")]
-    [InlineData("HHmm", "\"22:00\"")]
+    [TestMethod]
+    [DataRow("HH:mm:ss.fff", "\"10:00:00 PM\"")]
+    [DataRow("hh:mm:ss tt", "\"22:30:30\"")]
+    [DataRow("HHmm", "\"22:00\"")]
     public void CannotDeserializeJson(string format, string json)
     {
         // Arrange - Act
@@ -58,10 +59,10 @@ public class TimeOnlyConverterTest
     /// <inheritdoc cref="TimeOnly(int, int, int, int)" path="/param[@name='minute']"/>
     /// <inheritdoc cref="TimeOnly(int, int, int, int)" path="/param[@name='second']"/>
     /// <param name="expected">Expected JSON string</param>
-    [Theory]
-    [InlineData("HH:mm:ss.fff", 0, 0, 0, "\"00:00:00.000\"")]
-    [InlineData("HHmm", 22, 0, 0, "\"2200\"")]
-    [InlineData("hh:mm:ss tt", 23, 59, 59, "\"11:59:59 PM\"")]
+    [TestMethod]
+    [DataRow("HH:mm:ss.fff", 0, 0, 0, "\"00:00:00.000\"")]
+    [DataRow("HHmm", 22, 0, 0, "\"2200\"")]
+    [DataRow("hh:mm:ss tt", 23, 59, 59, "\"11:59:59 PM\"")]
     public void CanSerializeJson(string format, int hour, int minute, int second, string expected)
         => JsonSerializer.Serialize(new TimeOnly(hour, minute, second, 0), CreateOption(format)).Should().Be(expected);
 }

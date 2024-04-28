@@ -3,6 +3,7 @@ namespace Nogic.JsonConverters.Test;
 /// <summary>
 /// Test for <see cref="BlankNullableConverterFactory"/> and <see cref="BlankNullableConverter{T}"/>.
 /// </summary>
+[TestClass]
 public sealed class BlankNullableConverterTest
 {
     private static readonly JsonSerializerOptions _options = new()
@@ -14,10 +15,10 @@ public sealed class BlankNullableConverterTest
     /// <see cref="BlankNullableConverterFactory.CanConvert"/> returns <see langword="true"/>.
     /// </summary>
     /// <param name="type">Type to convert</param>
-    [Theory]
-    [InlineData(typeof(int?))]
-    [InlineData(typeof(TypeCode?))]
-    [InlineData(typeof(DateTimeOffset?))]
+    [TestMethod]
+    [DataRow(typeof(int?))]
+    [DataRow(typeof(TypeCode?))]
+    [DataRow(typeof(DateTimeOffset?))]
     public void CanConvert_Returns_True(Type type)
         => new BlankNullableConverterFactory().CanConvert(type).Should().BeTrue();
 
@@ -25,13 +26,13 @@ public sealed class BlankNullableConverterTest
     /// <see cref="BlankNullableConverterFactory.CanConvert"/> returns <see langword="false"/>.
     /// </summary>
     /// <param name="type">Type to convert</param>
-    [Theory]
-    [InlineData(typeof(int))]
-    [InlineData(typeof(string))]
-    [InlineData(typeof(TypeCode))]
-    [InlineData(typeof(DateTimeOffset))]
-    [InlineData(typeof(Array))]
-    [InlineData(typeof(Dictionary<,>))]
+    [TestMethod]
+    [DataRow(typeof(int))]
+    [DataRow(typeof(string))]
+    [DataRow(typeof(TypeCode))]
+    [DataRow(typeof(DateTimeOffset))]
+    [DataRow(typeof(Array))]
+    [DataRow(typeof(Dictionary<,>))]
     public void CanConvert_Returns_False(Type type)
         => new BlankNullableConverterFactory().CanConvert(type).Should().BeFalse();
 
@@ -48,12 +49,20 @@ public sealed class BlankNullableConverterTest
     /// <typeparam name="T">Type of <paramref name="value"/></typeparam>
     /// <param name="value">serialize target</param>
     /// <param name="expectedJson">expected JSON string</param>
-    [Theory]
-    [MemberData(nameof(TestData_CanSerializeJson))]
-    public void CanSerializeJson<T>(T value, string expectedJson) where T : struct
+    [TestMethod]
+    public void CanSerializeJson()
     {
-        _ = JsonSerializer.Serialize(new T?(), _options).Should().Be("null");
-        _ = JsonSerializer.Serialize<T?>(value, _options).Should().Be(expectedJson);
+        // int
+        _ = JsonSerializer.Serialize((int?)null, _options).Should().Be("null");
+        _ = JsonSerializer.Serialize(1, _options).Should().Be("1");
+
+        // enum
+        _ = JsonSerializer.Serialize((TypeCode?)null, _options).Should().Be("null");
+        _ = JsonSerializer.Serialize(TypeCode.Decimal, _options).Should().Be("15");
+
+        // DateTimeOffset
+        _ = JsonSerializer.Serialize((DateTimeOffset?)null, _options).Should().Be("null");
+        _ = JsonSerializer.Serialize(new DateTimeOffset(2022, 1, 26, 10, 0, 27, 0, TimeSpan.Zero), _options).Should().Be("\"2022-01-26T10:00:27+00:00\"");
     }
 
     /// <summary>Test data for <see cref="CanDeserializeJson"/></summary>
@@ -69,12 +78,22 @@ public sealed class BlankNullableConverterTest
     /// <typeparam name="T">Type of <paramref name="expected"/></typeparam>
     /// <param name="json">JSON string for deserialize</param>
     /// <param name="expected">expected value</param>
-    [Theory]
-    [MemberData(nameof(TestData_CanDeserializeJson))]
-    public void CanDeserializeJson<T>(string json, T expected) where T : struct
+    [TestMethod]
+    public void CanDeserializeJson()
     {
-        _ = JsonSerializer.Deserialize<T?>("null", _options).Should().BeNull();
-        _ = JsonSerializer.Deserialize<T?>("\"\"", _options).Should().BeNull();
-        _ = JsonSerializer.Deserialize<T?>(json, _options).Should().Be(expected);
+        // int
+        _ = JsonSerializer.Deserialize<int?>("null", _options).Should().BeNull();
+        _ = JsonSerializer.Deserialize<int?>("\"\"", _options).Should().BeNull();
+        _ = JsonSerializer.Deserialize<int?>("1", _options).Should().Be(1);
+
+        // enum
+        _ = JsonSerializer.Deserialize<TypeCode?>("null", _options).Should().BeNull();
+        _ = JsonSerializer.Deserialize<TypeCode?>("\"\"", _options).Should().BeNull();
+        _ = JsonSerializer.Deserialize<TypeCode?>("3", _options).Should().Be(TypeCode.Boolean);
+
+        // DateTimeOffset
+        _ = JsonSerializer.Deserialize<DateTimeOffset?>("null", _options).Should().BeNull();
+        _ = JsonSerializer.Deserialize<DateTimeOffset?>("\"\"", _options).Should().BeNull();
+        _ = JsonSerializer.Deserialize<DateTimeOffset?>("\"2022-01-26T10:00:27+00:00\"", _options).Should().Be(new DateTimeOffset(2022, 1, 26, 10, 0, 27, 0, TimeSpan.Zero));
     }
 }

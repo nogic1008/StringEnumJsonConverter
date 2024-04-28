@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 namespace Nogic.JsonConverters.Test;
 
 /// <summary>Unit test of <see cref="EnumStringConverterFactory"/> and <see cref="EnumStringConverter{T}"/></summary>
+[TestClass]
 public sealed class EnumStringConverterTest
 {
     /// <summary>
@@ -52,15 +53,15 @@ public sealed class EnumStringConverterTest
     /// <see cref="EnumStringConverterFactory.CanConvert"/> returns <see langword="true"/>.
     /// </summary>
     /// <param name="type">Type of enum</param>
-    [Theory]
-    [InlineData(typeof(TestEnumSByte))]
-    [InlineData(typeof(TestEnumByte))]
-    [InlineData(typeof(TestEnumInt16))]
-    [InlineData(typeof(TestEnumUInt16))]
-    [InlineData(typeof(TestEnumInt32))]
-    [InlineData(typeof(TestEnumUInt32))]
-    [InlineData(typeof(TestEnumInt64))]
-    [InlineData(typeof(TestEnumUInt64))]
+    [TestMethod]
+    [DataRow(typeof(TestEnumSByte))]
+    [DataRow(typeof(TestEnumByte))]
+    [DataRow(typeof(TestEnumInt16))]
+    [DataRow(typeof(TestEnumUInt16))]
+    [DataRow(typeof(TestEnumInt32))]
+    [DataRow(typeof(TestEnumUInt32))]
+    [DataRow(typeof(TestEnumInt64))]
+    [DataRow(typeof(TestEnumUInt64))]
     public void CanConvert_Returns_True(Type type)
         => new EnumStringConverterFactory().CanConvert(type).Should().BeTrue();
 
@@ -68,11 +69,11 @@ public sealed class EnumStringConverterTest
     /// <see cref="EnumStringConverterFactory.CanConvert"/> returns <see langword="false"/>.
     /// </summary>
     /// <param name="type">Type to convert</param>
-    [Theory]
-    [InlineData(typeof(string))]
-    [InlineData(typeof(int))]
-    [InlineData(typeof(DateTime))]
-    [InlineData(typeof(TestEnumInt32?))]
+    [TestMethod]
+    [DataRow(typeof(string))]
+    [DataRow(typeof(int))]
+    [DataRow(typeof(DateTime))]
+    [DataRow(typeof(TestEnumInt32?))]
     public void CanConvert_Returns_False(Type type)
         => new EnumStringConverterFactory().CanConvert(type).Should().BeFalse();
 
@@ -93,27 +94,27 @@ public sealed class EnumStringConverterTest
     /// <inheritdoc cref="CreateOption" path="/param[@name='useCamelCase']"/>
     /// <param name="enum">Serialize target</param>
     /// <param name="expected">Expected JSON string</param>
-    [Theory]
+    [TestMethod]
     // Default
-    [InlineData(true, false, (TestForConvert)(-1), "-1")]
-    [InlineData(true, false, TestForConvert.None, "\"None\"")]
-    [InlineData(true, false, TestForConvert.OneOne, "\"One_one\"")]
-    [InlineData(true, false, TestForConvert.TwoTwo, "\"TwoTwo\"")]
-    [InlineData(true, false, TestForConvert.OneOne | TestForConvert.TwoTwo, "\"OneOne, TwoTwo\"")]
-    [InlineData(true, false, TestForConvert.Four, "\"foo\"")]
+    [DataRow(true, false, (TestForConvert)(-1), "-1")]
+    [DataRow(true, false, TestForConvert.None, "\"None\"")]
+    [DataRow(true, false, TestForConvert.OneOne, "\"One_one\"")]
+    [DataRow(true, false, TestForConvert.TwoTwo, "\"TwoTwo\"")]
+    [DataRow(true, false, TestForConvert.OneOne | TestForConvert.TwoTwo, "\"OneOne, TwoTwo\"")]
+    [DataRow(true, false, TestForConvert.Four, "\"foo\"")]
     // Use JsonNamingPolicy.CamelCase
-    [InlineData(true, true, (TestForConvert)(-1), "-1")]
-    [InlineData(true, true, TestForConvert.None, "\"none\"")]
-    [InlineData(true, true, TestForConvert.OneOne, "\"One_one\"")]
-    [InlineData(true, true, TestForConvert.TwoTwo, "\"twoTwo\"")]
-    [InlineData(true, true, TestForConvert.OneOne | TestForConvert.TwoTwo, "\"oneOne, twoTwo\"")]
-    [InlineData(true, true, TestForConvert.Four, "\"foo\"")]
+    [DataRow(true, true, (TestForConvert)(-1), "-1")]
+    [DataRow(true, true, TestForConvert.None, "\"none\"")]
+    [DataRow(true, true, TestForConvert.OneOne, "\"One_one\"")]
+    [DataRow(true, true, TestForConvert.TwoTwo, "\"twoTwo\"")]
+    [DataRow(true, true, TestForConvert.OneOne | TestForConvert.TwoTwo, "\"oneOne, twoTwo\"")]
+    [DataRow(true, true, TestForConvert.Four, "\"foo\"")]
     // Disallow integer
-    [InlineData(false, false, TestForConvert.None, "\"None\"")]
-    [InlineData(false, false, TestForConvert.OneOne, "\"One_one\"")]
-    [InlineData(false, false, TestForConvert.TwoTwo, "\"TwoTwo\"")]
-    [InlineData(false, false, TestForConvert.OneOne | TestForConvert.TwoTwo, "\"OneOne, TwoTwo\"")]
-    [InlineData(false, false, TestForConvert.Four, "\"foo\"")]
+    [DataRow(false, false, TestForConvert.None, "\"None\"")]
+    [DataRow(false, false, TestForConvert.OneOne, "\"One_one\"")]
+    [DataRow(false, false, TestForConvert.TwoTwo, "\"TwoTwo\"")]
+    [DataRow(false, false, TestForConvert.OneOne | TestForConvert.TwoTwo, "\"OneOne, TwoTwo\"")]
+    [DataRow(false, false, TestForConvert.Four, "\"foo\"")]
     public void CanSerializeJson(bool allowInteger, bool useCamelCase, TestForConvert @enum, string expected)
         => JsonSerializer.Serialize(@enum, CreateOption(allowInteger, useCamelCase)).Should().Be(expected);
 
@@ -123,9 +124,9 @@ public sealed class EnumStringConverterTest
     /// <inheritdoc cref="CreateOption" path="/param[@name='allowInteger']"/>
     /// <inheritdoc cref="CreateOption" path="/param[@name='useCamelCase']"/>
     /// <param name="enum">Serialize target</param>
-    [Theory]
+    [TestMethod]
     // Disallow integer
-    [InlineData(false, false, (TestForConvert)(-1))]
+    [DataRow(false, false, (TestForConvert)(-1))]
     public void CannotSerializeJson(bool allowInteger, bool useCamelCase, TestForConvert @enum)
     {
         var action = () => JsonSerializer.Serialize(@enum, CreateOption(allowInteger, useCamelCase));
@@ -139,27 +140,27 @@ public sealed class EnumStringConverterTest
     /// <inheritdoc cref="CreateOption" path="/param[@name='useCamelCase']"/>
     /// <param name="json">JSON string</param>
     /// <param name="expected">Expected <see langword="enum"/> value</param>
-    [Theory]
+    [TestMethod]
     // Default
-    [InlineData(true, false, "-1", (TestForConvert)(-1))]
-    [InlineData(true, false, "\"None\"", TestForConvert.None)]
-    [InlineData(true, false, "\"One_one\"", TestForConvert.OneOne)]
-    [InlineData(true, false, "\"TwoTwo\"", TestForConvert.TwoTwo)]
-    [InlineData(true, false, "\"OneOne, TwoTwo\"", TestForConvert.OneOne | TestForConvert.TwoTwo)]
-    [InlineData(true, false, "\"4\"", TestForConvert.Four)]
+    [DataRow(true, false, "-1", (TestForConvert)(-1))]
+    [DataRow(true, false, "\"None\"", TestForConvert.None)]
+    [DataRow(true, false, "\"One_one\"", TestForConvert.OneOne)]
+    [DataRow(true, false, "\"TwoTwo\"", TestForConvert.TwoTwo)]
+    [DataRow(true, false, "\"OneOne, TwoTwo\"", TestForConvert.OneOne | TestForConvert.TwoTwo)]
+    [DataRow(true, false, "\"4\"", TestForConvert.Four)]
     // Use JsonNamingPolicy.CamelCase
-    [InlineData(true, true, "-1", (TestForConvert)(-1))]
-    [InlineData(true, true, "\"none\"", TestForConvert.None)]
-    [InlineData(true, true, "\"One_one\"", TestForConvert.OneOne)]
-    [InlineData(true, true, "\"TwoTwo\"", TestForConvert.TwoTwo)]
-    [InlineData(true, true, "\"OneOne, TwoTwo\"", TestForConvert.OneOne | TestForConvert.TwoTwo)]
-    [InlineData(true, true, "\"4\"", TestForConvert.Four)]
+    [DataRow(true, true, "-1", (TestForConvert)(-1))]
+    [DataRow(true, true, "\"none\"", TestForConvert.None)]
+    [DataRow(true, true, "\"One_one\"", TestForConvert.OneOne)]
+    [DataRow(true, true, "\"TwoTwo\"", TestForConvert.TwoTwo)]
+    [DataRow(true, true, "\"OneOne, TwoTwo\"", TestForConvert.OneOne | TestForConvert.TwoTwo)]
+    [DataRow(true, true, "\"4\"", TestForConvert.Four)]
     // Disallow integer
-    [InlineData(false, false, "\"None\"", TestForConvert.None)]
-    [InlineData(false, false, "\"One_one\"", TestForConvert.OneOne)]
-    [InlineData(false, false, "\"TwoTwo\"", TestForConvert.TwoTwo)]
-    [InlineData(false, false, "\"OneOne, TwoTwo\"", TestForConvert.OneOne | TestForConvert.TwoTwo)]
-    [InlineData(false, false, "\"4\"", TestForConvert.Four)]
+    [DataRow(false, false, "\"None\"", TestForConvert.None)]
+    [DataRow(false, false, "\"One_one\"", TestForConvert.OneOne)]
+    [DataRow(false, false, "\"TwoTwo\"", TestForConvert.TwoTwo)]
+    [DataRow(false, false, "\"OneOne, TwoTwo\"", TestForConvert.OneOne | TestForConvert.TwoTwo)]
+    [DataRow(false, false, "\"4\"", TestForConvert.Four)]
     public void CanDeserializeJson(bool allowInteger, bool useCamelCase, string json, TestForConvert expected)
         => JsonSerializer.Deserialize<TestForConvert>(json, CreateOption(allowInteger, useCamelCase)).Should().Be(expected);
 
@@ -169,23 +170,23 @@ public sealed class EnumStringConverterTest
     /// <inheritdoc cref="CreateOption" path="/param[@name='allowInteger']"/>
     /// <inheritdoc cref="CreateOption" path="/param[@name='useCamelCase']"/>
     /// <param name="json">JSON string</param>
-    [Theory]
+    [TestMethod]
     // Default
-    [InlineData(true, false, "\"\"")]
-    [InlineData(true, false, "OneOne")]
-    [InlineData(true, false, "twotwo")]
-    [InlineData(true, false, "\"One_one, TwoTwo\"")]
+    [DataRow(true, false, "\"\"")]
+    [DataRow(true, false, "OneOne")]
+    [DataRow(true, false, "twotwo")]
+    [DataRow(true, false, "\"One_one, TwoTwo\"")]
     // Use JsonNamingPolicy.CamelCase
-    [InlineData(true, true, "\"\"")]
-    [InlineData(true, true, "OneOne")]
-    [InlineData(true, true, "twotwo")]
-    [InlineData(true, true, "\"One_one, TwoTwo\"")]
+    [DataRow(true, true, "\"\"")]
+    [DataRow(true, true, "OneOne")]
+    [DataRow(true, true, "twotwo")]
+    [DataRow(true, true, "\"One_one, TwoTwo\"")]
     // Disallow integer
-    [InlineData(false, false, "\"\"")]
-    [InlineData(false, false, "-1")]
-    [InlineData(false, false, "OneOne")]
-    [InlineData(false, false, "twotwo")]
-    [InlineData(false, false, "\"One_one, TwoTwo\"")]
+    [DataRow(false, false, "\"\"")]
+    [DataRow(false, false, "-1")]
+    [DataRow(false, false, "OneOne")]
+    [DataRow(false, false, "twotwo")]
+    [DataRow(false, false, "\"One_one, TwoTwo\"")]
     public void CannotDeserializeJson(bool allowInteger, bool useCamelCase, string json)
     {
         var action = () => JsonSerializer.Deserialize<TestForConvert>(json, CreateOption(allowInteger, useCamelCase));
@@ -197,46 +198,46 @@ public sealed class EnumStringConverterTest
     /// </summary>
     /// <param name="enum">Serialize target</param>
     /// <param name="expected">Expected JSON string</param>
-    [Theory]
-    [InlineData(TestEnumSByte.Min, "\"Min\"")]
-    [InlineData(TestEnumByte.Min, "\"Min\"")]
-    [InlineData(TestEnumInt16.Min, "\"Min\"")]
-    [InlineData(TestEnumUInt16.Min, "\"Min\"")]
-    [InlineData(TestEnumInt32.Min, "\"Min\"")]
-    [InlineData(TestEnumUInt32.Min, "\"Min\"")]
-    [InlineData(TestEnumInt64.Min, "\"Min\"")]
-    [InlineData(TestEnumUInt64.Min, "\"Min\"")]
-    [InlineData(TestEnumSByte.One, "\"One\"")]
-    [InlineData(TestEnumByte.One, "\"One\"")]
-    [InlineData(TestEnumInt16.One, "\"One\"")]
-    [InlineData(TestEnumUInt16.One, "\"One\"")]
-    [InlineData(TestEnumInt32.One, "\"One\"")]
-    [InlineData(TestEnumUInt32.One, "\"One\"")]
-    [InlineData(TestEnumInt64.One, "\"One\"")]
-    [InlineData(TestEnumUInt64.One, "\"One\"")]
-    [InlineData((TestEnumSByte)100, "100")]
-    [InlineData((TestEnumByte)100, "100")]
-    [InlineData((TestEnumInt16)100, "100")]
-    [InlineData((TestEnumUInt16)100, "100")]
-    [InlineData((TestEnumInt32)100, "100")]
-    [InlineData((TestEnumUInt32)100, "100")]
-    [InlineData((TestEnumInt64)100, "100")]
-    [InlineData((TestEnumUInt64)100, "100")]
-    [InlineData(TestEnumSByte.Max, "\"Max\"")]
-    [InlineData(TestEnumByte.Max, "\"Max\"")]
-    [InlineData(TestEnumInt16.Max, "\"Max\"")]
-    [InlineData(TestEnumUInt16.Max, "\"Max\"")]
-    [InlineData(TestEnumInt32.Max, "\"Max\"")]
-    [InlineData(TestEnumUInt32.Max, "\"Max\"")]
-    [InlineData(TestEnumInt64.Max, "\"Max\"")]
-    [InlineData(TestEnumUInt64.Max, "\"Max\"")]
+    [TestMethod]
+    [DataRow(TestEnumSByte.Min, "\"Min\"")]
+    [DataRow(TestEnumByte.Min, "\"Min\"")]
+    [DataRow(TestEnumInt16.Min, "\"Min\"")]
+    [DataRow(TestEnumUInt16.Min, "\"Min\"")]
+    [DataRow(TestEnumInt32.Min, "\"Min\"")]
+    [DataRow(TestEnumUInt32.Min, "\"Min\"")]
+    [DataRow(TestEnumInt64.Min, "\"Min\"")]
+    [DataRow(TestEnumUInt64.Min, "\"Min\"")]
+    [DataRow(TestEnumSByte.One, "\"One\"")]
+    [DataRow(TestEnumByte.One, "\"One\"")]
+    [DataRow(TestEnumInt16.One, "\"One\"")]
+    [DataRow(TestEnumUInt16.One, "\"One\"")]
+    [DataRow(TestEnumInt32.One, "\"One\"")]
+    [DataRow(TestEnumUInt32.One, "\"One\"")]
+    [DataRow(TestEnumInt64.One, "\"One\"")]
+    [DataRow(TestEnumUInt64.One, "\"One\"")]
+    [DataRow((TestEnumSByte)100, "100")]
+    [DataRow((TestEnumByte)100, "100")]
+    [DataRow((TestEnumInt16)100, "100")]
+    [DataRow((TestEnumUInt16)100, "100")]
+    [DataRow((TestEnumInt32)100, "100")]
+    [DataRow((TestEnumUInt32)100, "100")]
+    [DataRow((TestEnumInt64)100, "100")]
+    [DataRow((TestEnumUInt64)100, "100")]
+    [DataRow(TestEnumSByte.Max, "\"Max\"")]
+    [DataRow(TestEnumByte.Max, "\"Max\"")]
+    [DataRow(TestEnumInt16.Max, "\"Max\"")]
+    [DataRow(TestEnumUInt16.Max, "\"Max\"")]
+    [DataRow(TestEnumInt32.Max, "\"Max\"")]
+    [DataRow(TestEnumUInt32.Max, "\"Max\"")]
+    [DataRow(TestEnumInt64.Max, "\"Max\"")]
+    [DataRow(TestEnumUInt64.Max, "\"Max\"")]
     public void CanSerializeJson_Type(object @enum, string expected)
         => JsonSerializer.Serialize(@enum, CreateOption(true, false)).Should().Be(expected);
 
     /// <summary>
     /// <see cref="EnumStringConverter{TEnum}.Read"/> returns expected <see langword="enum"/>.
     /// </summary>
-    [Fact]
+    [TestMethod]
     public void CanDeserializeJson_Type()
     {
         var option = CreateOption(true, false);

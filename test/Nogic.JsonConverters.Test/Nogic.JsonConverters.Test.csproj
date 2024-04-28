@@ -5,16 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="coverlet.collector" Version="6.0.0">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
     <PackageReference Include="FluentAssertions" Version="6.12.0" />
-    <PackageReference Include="xunit" Version="2.7.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.0">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
@@ -26,7 +17,7 @@
   <ItemGroup>
     <Using Include="System.Text.Json" />
     <Using Include="FluentAssertions" />
-    <Using Include="Xunit" />
+    <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
   </ItemGroup>
 
   <ItemGroup>

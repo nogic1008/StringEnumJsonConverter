@@ -186,7 +186,7 @@ public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : str
         if (!name.Contains(ValueSeparator))
             return _namingPolicy.ConvertName(name);
 
-        string[] enumValues = name.Split(new string[] { ValueSeparator }, StringSplitOptions.None);
+        string[] enumValues = name.Split([ValueSeparator], StringSplitOptions.None);
         for (int i = 0; i < enumValues.Length; i++)
             enumValues[i] = _namingPolicy.ConvertName(enumValues[i]);
         return string.Join(ValueSeparator, enumValues);

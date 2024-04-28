@@ -8,6 +8,9 @@ namespace Nogic.JsonConverters;
 public class BlankNullableConverter<T>(JsonConverter<T> converter) : JsonConverter<T?> where T : struct
 {
     /// <inheritdoc/>
+    public override bool HandleNull => true;
+
+    /// <inheritdoc/>
     public override T? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
         reader.TokenType != JsonTokenType.Null
         && (reader.TokenType != JsonTokenType.String || !string.IsNullOrEmpty(reader.GetString()))
@@ -16,6 +19,12 @@ public class BlankNullableConverter<T>(JsonConverter<T> converter) : JsonConvert
 
     /// <inheritdoc/>
     public override void Write(Utf8JsonWriter writer, T? value, JsonSerializerOptions options)
-        // If value is null, this method is not called.
-        => converter.Write(writer, value.GetValueOrDefault(), options);
+    {
+        if (value is null)
+        {
+            writer.WriteStringValue(string.Empty);
+            return;
+        }
+        converter.Write(writer, value.GetValueOrDefault(), options);
+    }
 }

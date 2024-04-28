@@ -6,7 +6,7 @@ namespace Nogic.JsonConverters.Test;
 [TestClass]
 public sealed class BlankNullableConverterTest
 {
-    private static readonly JsonSerializerOptions Options = new()
+    private static readonly JsonSerializerOptions _options = new()
     {
         Converters = { new BlankNullableConverterFactory() }
     };
@@ -46,16 +46,16 @@ public sealed class BlankNullableConverterTest
     public void CanSerializeJson()
     {
         // int
-        _ = JsonSerializer.Serialize((int?)null, Options).Should().Be("\"\"");
-        _ = JsonSerializer.Serialize(1, Options).Should().Be("1");
+        _ = JsonSerializer.Serialize((int?)null, _options).Should().Be("\"\"");
+        _ = JsonSerializer.Serialize(1, _options).Should().Be("1");
 
         // enum
-        _ = JsonSerializer.Serialize((TypeCode?)null, Options).Should().Be("\"\"");
-        _ = JsonSerializer.Serialize(TypeCode.Decimal, Options).Should().Be("15");
+        _ = JsonSerializer.Serialize((TypeCode?)null, _options).Should().Be("\"\"");
+        _ = JsonSerializer.Serialize(TypeCode.Decimal, _options).Should().Be("15");
 
         // DateTimeOffset
-        _ = JsonSerializer.Serialize((DateTimeOffset?)null, Options).Should().Be("\"\"");
-        _ = JsonSerializer.Serialize(new DateTimeOffset(2022, 1, 26, 10, 0, 27, 0, TimeSpan.Zero), Options).Should().Be("\"2022-01-26T10:00:27+00:00\"");
+        _ = JsonSerializer.Serialize((DateTimeOffset?)null, _options).Should().Be("\"\"");
+        _ = JsonSerializer.Serialize(new DateTimeOffset(2022, 1, 26, 10, 0, 27, 0, TimeSpan.Zero), _options).Should().Be("\"2022-01-26T10:00:27+00:00\"");
     }
 
     /// <summary>
@@ -68,18 +68,18 @@ public sealed class BlankNullableConverterTest
     public void CanDeserializeJson()
     {
         // int
-        _ = JsonSerializer.Deserialize<int?>("null", Options).Should().BeNull();
-        _ = JsonSerializer.Deserialize<int?>("\"\"", Options).Should().BeNull();
-        _ = JsonSerializer.Deserialize<int?>("1", Options).Should().Be(1);
+        _ = JsonSerializer.Deserialize<int?>("null", _options).Should().BeNull();
+        _ = JsonSerializer.Deserialize<int?>("\"\"", _options).Should().BeNull();
+        _ = JsonSerializer.Deserialize<int?>("1", _options).Should().Be(1);
 
         // enum
-        _ = JsonSerializer.Deserialize<TypeCode?>("null", Options).Should().BeNull();
-        _ = JsonSerializer.Deserialize<TypeCode?>("\"\"", Options).Should().BeNull();
-        _ = JsonSerializer.Deserialize<TypeCode?>("3", Options).Should().Be(TypeCode.Boolean);
+        _ = JsonSerializer.Deserialize<TypeCode?>("null", _options).Should().BeNull();
+        _ = JsonSerializer.Deserialize<TypeCode?>("\"\"", _options).Should().BeNull();
+        _ = JsonSerializer.Deserialize<TypeCode?>("3", _options).Should().Be(TypeCode.Boolean);
 
         // DateTimeOffset
-        _ = JsonSerializer.Deserialize<DateTimeOffset?>("null", Options).Should().BeNull();
-        _ = JsonSerializer.Deserialize<DateTimeOffset?>("\"\"", Options).Should().BeNull();
-        _ = JsonSerializer.Deserialize<DateTimeOffset?>("\"2022-01-26T10:00:27+00:00\"", Options).Should().Be(new DateTimeOffset(2022, 1, 26, 10, 0, 27, 0, TimeSpan.Zero));
+        _ = JsonSerializer.Deserialize<DateTimeOffset?>("null", _options).Should().BeNull();
+        _ = JsonSerializer.Deserialize<DateTimeOffset?>("\"\"", _options).Should().BeNull();
+        _ = JsonSerializer.Deserialize<DateTimeOffset?>("\"2022-01-26T10:00:27+00:00\"", _options).Should().Be(new DateTimeOffset(2022, 1, 26, 10, 0, 27, 0, TimeSpan.Zero));
     }
 }

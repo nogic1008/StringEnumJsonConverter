@@ -16,7 +16,7 @@ public sealed class JsonLowerCaseNamingPolicyTest
     [DataRow("UPPER", "upper")]
     [DataRow("lower", "lower")]
     [DataRow("camelUPPER", "camel_upper")]
-    [DataRow("WithNumber123", "with_number_123")]
+    [DataRow("WithNumber123", "with_number123")]
     public void JsonLowerSnakeCaseNamingPolicy_ConvertName(string name, string expected)
 #pragma warning disable CS0618
         => new JsonLowerSnakeCaseNamingPolicy().ConvertName(name).Should().Be(expected);
@@ -35,7 +35,7 @@ public sealed class JsonLowerCaseNamingPolicyTest
     [DataRow("UPPER", "UPPER")]
     [DataRow("lower", "LOWER")]
     [DataRow("camelUPPER", "CAMEL_UPPER")]
-    [DataRow("WithNumber123", "WITH_NUMBER_123")]
+    [DataRow("WithNumber123", "WITH_NUMBER123")]
     public void JsonUpperSnakeCaseNamingPolicy_ConvertName(string name, string expected)
 #pragma warning disable CS0618
         => new JsonUpperSnakeCaseNamingPolicy().ConvertName(name).Should().Be(expected);
@@ -54,7 +54,7 @@ public sealed class JsonLowerCaseNamingPolicyTest
     [DataRow("UPPER", "upper")]
     [DataRow("lower", "lower")]
     [DataRow("camelUPPER", "camel-upper")]
-    [DataRow("WithNumber123", "with-number-123")]
+    [DataRow("WithNumber123", "with-number123")]
     public void JsonKebabCaseNamingPolicy_ConvertName(string name, string expected)
 #pragma warning disable CS0618
         => new JsonKebabCaseNamingPolicy().ConvertName(name).Should().Be(expected);

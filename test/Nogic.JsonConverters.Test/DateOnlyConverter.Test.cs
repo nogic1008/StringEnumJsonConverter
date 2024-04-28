@@ -2,6 +2,7 @@ using System.Globalization;
 
 namespace Nogic.JsonConverters.Test;
 
+
 /// <summary>Unit test of <see cref="DateOnlyConverter"/></summary>
 [TestClass]
 public sealed class DateOnlyConverterTest
@@ -12,10 +13,14 @@ public sealed class DateOnlyConverterTest
     /// <param name="format">
     /// <inheritdoc cref="DateOnlyConverter(string, IFormatProvider?)" path="/param[@name='serializationFormat']"/>
     /// </param>
-#pragma warning disable CS0618
     private static JsonSerializerOptions CreateOption(string format)
+#if NET7_0_OR_GREATER
+#pragma warning disable CS0618
+#endif
         => new() { Converters = { new DateOnlyConverter(format, CultureInfo.InvariantCulture) } };
-#pragma warning restore
+#if NET7_0_OR_GREATER
+#pragma warning restore CS0618
+#endif
 
     /// <summary>
     /// <see cref="DateOnlyConverter.Read"/> returns expected <see cref="DateOnly"/> object.

@@ -5,9 +5,6 @@ using System.Runtime.Serialization;
 
 namespace Nogic.JsonConverters;
 
-// disable switch pattern warnings
-#pragma warning disable IDE0072
-
 /// <inheritdoc cref="EnumStringConverterFactory"/>
 /// <typeparam name="TEnum"><see langword="enum"/> type</typeparam>
 public class EnumStringConverter<TEnum> : JsonConverter<TEnum> where TEnum : struct, Enum

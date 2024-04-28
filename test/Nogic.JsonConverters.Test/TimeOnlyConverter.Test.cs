@@ -12,10 +12,14 @@ public class TimeOnlyConverterTest
     /// <param name="format">
     /// <inheritdoc cref="TimeOnlyConverter(string, IFormatProvider?)" path="/param[@name='serializationFormat']"/>
     /// </param>
-#pragma warning disable CS0618
     private static JsonSerializerOptions CreateOption(string format)
+#if NET7_0_OR_GREATER
+#pragma warning disable CS0618
+#endif
         => new() { Converters = { new TimeOnlyConverter(format, CultureInfo.InvariantCulture) } };
-#pragma warning restore
+#if NET7_0_OR_GREATER
+#pragma warning restore CS0618
+#endif
 
     /// <summary>
     /// <see cref="TimeOnlyConverter.Read"/> returns expected <see cref="TimeOnly"/> object.

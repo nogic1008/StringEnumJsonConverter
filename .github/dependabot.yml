@@ -11,7 +11,8 @@ updates:
       time: '08:00'
       timezone: Japan
     labels:
-      - 'dependabot:robot:'
+      - 'dependabot :robot:'
+    milestone: 4
     commit-message:
       prefix: fix
       prefix-development: chore
@@ -25,7 +26,8 @@ updates:
       time: '08:00'
       timezone: Japan
     labels:
-      - 'dependabot:robot:'
+      - 'dependabot :robot:'
+    milestone: 4
     commit-message:
       prefix: fix
       prefix-development: chore

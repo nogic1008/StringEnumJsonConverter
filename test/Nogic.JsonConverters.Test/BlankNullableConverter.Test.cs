@@ -12,18 +12,18 @@ public sealed class BlankNullableConverterTest
     };
 
     /// <summary>
-    /// <see cref="BlankNullableConverterFactory.CanConvert"/> returns <see langword="true"/>.
+    /// When <paramref name="type"/> is <see cref="Nullable{T}"/>, <see cref="BlankNullableConverterFactory.CanConvert"/> returns <see langword="true"/>.
     /// </summary>
     /// <param name="type">Type to convert</param>
     [TestMethod]
     [DataRow(typeof(int?))]
     [DataRow(typeof(TypeCode?))]
     [DataRow(typeof(DateTimeOffset?))]
-    public void CanConvert_Returns_True(Type type)
+    public void When_Type_Is_NullableStruct_CanConvert_Returns_True(Type type)
         => new BlankNullableConverterFactory().CanConvert(type).Should().BeTrue();
 
     /// <summary>
-    /// <see cref="BlankNullableConverterFactory.CanConvert"/> returns <see langword="false"/>.
+    /// When <paramref name="type"/> is not <see cref="Nullable{T}"/>, <see cref="BlankNullableConverterFactory.CanConvert"/> returns <see langword="false"/>.
     /// </summary>
     /// <param name="type">Type to convert</param>
     [TestMethod]
@@ -33,7 +33,7 @@ public sealed class BlankNullableConverterTest
     [DataRow(typeof(DateTimeOffset))]
     [DataRow(typeof(Array))]
     [DataRow(typeof(Dictionary<,>))]
-    public void CanConvert_Returns_False(Type type)
+    public void When_Type_Is_Not_NullableStruct_CanConvert_Returns_False(Type type)
         => new BlankNullableConverterFactory().CanConvert(type).Should().BeFalse();
 
     /// <summary>
@@ -46,16 +46,16 @@ public sealed class BlankNullableConverterTest
     public void CanSerializeJson()
     {
         // int
-        _ = JsonSerializer.Serialize((int?)null, _options).Should().Be("null");
+        _ = JsonSerializer.Serialize((int?)null, _options).Should().Be("\"\"");
         _ = JsonSerializer.Serialize(1, _options).Should().Be("1");
 
         // enum
-        _ = JsonSerializer.Serialize((TypeCode?)null, _options).Should().Be("null");
-        _ = JsonSerializer.Serialize(TypeCode.Decimal, _options).Should().Be("15");
+        _ = JsonSerializer.Serialize((TypeCode?)null, _options).Should().Be("\"\"");
+        _ = JsonSerializer.Serialize((TypeCode?)TypeCode.Decimal, _options).Should().Be("15");
 
         // DateTimeOffset
-        _ = JsonSerializer.Serialize((DateTimeOffset?)null, _options).Should().Be("null");
-        _ = JsonSerializer.Serialize(new DateTimeOffset(2022, 1, 26, 10, 0, 27, 0, TimeSpan.Zero), _options).Should().Be("\"2022-01-26T10:00:27+00:00\"");
+        _ = JsonSerializer.Serialize((DateTimeOffset?)null, _options).Should().Be("\"\"");
+        _ = JsonSerializer.Serialize((DateTimeOffset?)new DateTimeOffset(2022, 1, 26, 10, 0, 27, 0, TimeSpan.Zero), _options).Should().Be("\"2022-01-26T10:00:27+00:00\"");
     }
 
     /// <summary>

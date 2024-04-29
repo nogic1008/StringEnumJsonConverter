@@ -1,7 +1,9 @@
 namespace Nogic.JsonConverters.Test;
 
-/// <summary>Unit test for <see cref="JsonNamingPolicyBase"/></summary>
-public sealed class JsonLowerCaseNamingPolicyTest
+/// <summary>
+/// Unit tests for classes that inherit from <see cref="JsonSeparatorNamingPolicy"/>.
+/// </summary>
+public sealed class JsonSeparatorNamingPolicyTest
 {
     /// <summary>Unit test for <see cref="JsonLowerSnakeCaseNamingPolicy"/></summary>
     /// <param name="name">Original name</param>

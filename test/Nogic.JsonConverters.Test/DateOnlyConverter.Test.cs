@@ -2,7 +2,6 @@ using System.Globalization;
 
 namespace Nogic.JsonConverters.Test;
 
-
 /// <summary>Unit test of <see cref="DateOnlyConverter"/></summary>
 [TestClass]
 public sealed class DateOnlyConverterTest

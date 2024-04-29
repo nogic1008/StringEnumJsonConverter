@@ -51,11 +51,11 @@ public sealed class BlankNullableConverterTest
 
         // enum
         _ = JsonSerializer.Serialize((TypeCode?)null, _options).Should().Be("\"\"");
-        _ = JsonSerializer.Serialize(TypeCode.Decimal, _options).Should().Be("15");
+        _ = JsonSerializer.Serialize((TypeCode?)TypeCode.Decimal, _options).Should().Be("15");
 
         // DateTimeOffset
         _ = JsonSerializer.Serialize((DateTimeOffset?)null, _options).Should().Be("\"\"");
-        _ = JsonSerializer.Serialize(new DateTimeOffset(2022, 1, 26, 10, 0, 27, 0, TimeSpan.Zero), _options).Should().Be("\"2022-01-26T10:00:27+00:00\"");
+        _ = JsonSerializer.Serialize((DateTimeOffset?)new DateTimeOffset(2022, 1, 26, 10, 0, 27, 0, TimeSpan.Zero), _options).Should().Be("\"2022-01-26T10:00:27+00:00\"");
     }
 
     /// <summary>

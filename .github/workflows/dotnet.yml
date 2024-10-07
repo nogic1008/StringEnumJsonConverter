@@ -21,7 +21,7 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.2.0
+      - uses: actions/checkout@v4.2.1
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4.0.1
       - name: Add Problem Matcher for dotnet-format
@@ -50,7 +50,7 @@ jobs:
           - os: windows-latest
             framework: net48
     steps:
-      - uses: actions/checkout@v4.2.0
+      - uses: actions/checkout@v4.2.1
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4.0.1
         with:

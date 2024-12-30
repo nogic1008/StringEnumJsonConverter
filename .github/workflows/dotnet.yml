@@ -66,9 +66,9 @@ jobs:
         run: dotnet test -f ${{ matrix.framework }} --no-build -p:TestingPlatformCommandLineArguments="--coverage --coverage-output-format cobertura --coverage-output ${{ vars.COVERAGE_REPORT_FILE }}"
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4.6.0
+        uses: codecov/codecov-action@v5.1.2
         with:
           flags: ${{ runner.os }},${{ matrix.framework }}
-          file: ./test/Nogic.JsonConverters.Test/bin/Debug/${{ matrix.framework }}/TestResults/${{ vars.COVERAGE_REPORT_FILE }}
+          files: ./test/Nogic.JsonConverters.Test/bin/Debug/${{ matrix.framework }}/TestResults/${{ vars.COVERAGE_REPORT_FILE }}
           disable_search: true
           token: ${{ secrets.CODECOV_TOKEN }}

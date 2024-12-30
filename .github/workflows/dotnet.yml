@@ -69,6 +69,6 @@ jobs:
         uses: codecov/codecov-action@v5.1.2
         with:
           flags: ${{ runner.os }},${{ matrix.framework }}
-          file: ./test/Nogic.JsonConverters.Test/bin/Debug/${{ matrix.framework }}/TestResults/${{ vars.COVERAGE_REPORT_FILE }}
+          files: ./test/Nogic.JsonConverters.Test/bin/Debug/${{ matrix.framework }}/TestResults/${{ vars.COVERAGE_REPORT_FILE }}
           disable_search: true
           token: ${{ secrets.CODECOV_TOKEN }}
